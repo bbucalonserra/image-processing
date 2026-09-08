@@ -53,6 +53,16 @@ class Carousel {
     }
 
     /**
+     * Moves to the previous entry, wrapping at the start of the row.
+     * @return {void}
+     */
+    retreatFeatured() {
+        if (!this.isLoaded()) return;
+        const count = this.items.length;
+        this.featuredIndex = (this.featuredIndex + count - 1) % count;
+    }
+
+    /**
      * Advances the scroll and wraps it by one card pitch.
      * @return {void}
      */

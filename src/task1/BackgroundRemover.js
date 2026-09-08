@@ -15,6 +15,20 @@ class BackgroundRemover {
      * @return {p5.Image} Copy whose background pixels are transparent.
      */
     removeBackground(source, setting) {
+        return this.removeBackgroundWithCounts(source, setting).image;
+    }
+
+    /**
+     * Same work as removeBackground, and also reports the two mistakes the
+     * threshold makes on its own, both in regions where the answer is known:
+     * backdrop it fails to remove in the two top corners, and subject it
+     * claims that the connected component step has to give back. Both are
+     * pixel counts and lower is better on both.
+     * @param {p5.Image} source - The provided image.
+     * @param {Array<number>} setting - The [colourSpace, c1, c2, c3] row.
+     * @return {object} {image, backdropLeft, reclaimed}.
+     */
+    removeBackgroundWithCounts(source, setting) {
         const w = source.width;
         const h = source.height;
 
@@ -23,7 +37,21 @@ class BackgroundRemover {
             ? this.maskByHsb(source, setting)
             : this.maskByRgb(source, setting);
 
-        const alpha = this.refiner.refine(mask, w, h);
+        const refined = this.refiner.refineWithCounts(mask, w, h);
+        const alpha = refined.alpha;
+
+        // The two top corners hold no subject in any of the eight images, so
+        // a pixel the threshold keeps there is backdrop it failed to remove.
+        // Whole top rows cannot be used, because hair reaches them.
+        const blockW = Math.max(1, Math.floor(w * 0.06));
+        const blockH = Math.max(1, Math.floor(h * 0.06));
+        let backdropLeft = 0;
+        for (let y = 0; y < blockH; y++) {
+            for (let x = 0; x < w; x++) {
+                if (x >= blockW && x < w - blockW) continue;
+                if (mask[x + y * w] === 0) backdropLeft++;
+            }
+        }
 
         const output = createImage(w, h);
         output.loadPixels();
@@ -37,7 +65,11 @@ class BackgroundRemover {
             }
         }
         output.updatePixels();
-        return output;
+        return {
+            image: output,
+            backdropLeft: backdropLeft,
+            reclaimed: refined.reclaimed
+        };
     }
 
     /**

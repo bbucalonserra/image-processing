@@ -54,6 +54,16 @@ class AnimationCycle {
     }
 
     /**
+     * Progress with a smoothstep applied, so the subject and the caption ease
+     * in and out of their travel instead of moving at a constant rate.
+     * @return {number} Eased position in the current stage, 0 to 1.
+     */
+    easedProgress() {
+        const p = this.progress();
+        return p * p * (3 - 2 * p);
+    }
+
+    /**
      * @return {number} Opacity for the current frame, 0 to 255.
      */
     alpha() {
@@ -72,7 +82,7 @@ class AnimationCycle {
      *     in stage, large to small on a zoom out.
      */
     scaleFactor() {
-        const p = this.progress();
+        const p = this.easedProgress();
         return this.zoomingIn
             ? lerp(this.minScale, this.maxScale, p)
             : lerp(this.maxScale, this.minScale, p);

@@ -35,7 +35,7 @@ class PanoramaScreen extends Screen {
     constructor(pairImages, panelTop) {
         super("TASK 2 - PANORAMA MOTION GUIDE", [
             "idle", "panorama", "pairs", "grey", "edges", "threshold",
-            "centroid", "arrow"
+            "centroid", "arrow", "flow"
         ]);
 
         this.pairImages = pairImages;
@@ -51,8 +51,10 @@ class PanoramaScreen extends Screen {
         /** @type {number} Index of the pair being examined. */
         this.pairIndex = 0;
 
-        /** @type {MotionEstimator} Turns two centroids into a direction. */
-        this.estimator = new MotionEstimator(4);
+        /** @type {MotionEstimator|null} Classifies a measured shift. */
+        this.estimator = null;
+        /** @type {BlockFlowEstimator} Second estimator, the extension. */
+        this.flowEstimator = new BlockFlowEstimator(0.25, 8, 28, 25);
         /** @type {ArrowOverlay} The large direction arrow. */
         this.arrow = new ArrowOverlay(300, 34, 100, 82);
 
@@ -106,7 +108,8 @@ class PanoramaScreen extends Screen {
             "e": "edges",
             "t": "threshold",
             "n": "centroid",
-            "d": "arrow"
+            "d": "arrow",
+            "f": "flow"
         };
 
         if (pressedKey === "i" && this.pairs.length === 0) {
@@ -142,6 +145,12 @@ class PanoramaScreen extends Screen {
             entry.expected
         ));
         this.pairIndex = 0;
+
+        // A dead zone of one hundredth of the frame keeps the rule the same
+        // whatever size the pairs are.
+        this.estimator = new MotionEstimator(
+            0.01, this.pairs[0].frameA.width, this.pairs[0].frameA.height
+        );
     }
 
     /**
@@ -174,6 +183,9 @@ class PanoramaScreen extends Screen {
         }
         if (reached >= this.stages.indexOf("arrow")) {
             pair.buildMotion(threshold, this.estimator);
+        }
+        if (reached >= this.stages.indexOf("flow")) {
+            pair.buildFlow(this.flowEstimator, this.estimator);
         }
     }
 
@@ -218,6 +230,44 @@ class PanoramaScreen extends Screen {
             pair.frame(slot),
             x, this.panelTop, this.panelWidth, this.panelHeight
         );
+        if (slot === 1 && pair.flow) this.drawFlowVectors(pair, x);
+    }
+
+    /**
+     * Draws the block matching vectors over Frame B, one line per matched
+     * block, so the measurement behind the second estimate is visible.
+     * @param {FramePair} pair - Pair on screen.
+     * @param {number} x - Left edge of the panel.
+     * @return {void}
+     */
+    drawFlowVectors(pair, x) {
+        const scaleX = this.panelWidth / pair.frameA.width;
+        const scaleY = this.panelHeight / pair.frameA.height;
+
+        push();
+        stroke(255, 210, 60);
+        strokeWeight(1.5);
+        for (const vector of pair.flow.vectors) {
+            const startX = x + vector.x * scaleX;
+            const startY = this.panelTop + vector.y * scaleY;
+            line(
+                startX,
+                startY,
+                startX + vector.dx * scaleX,
+                startY + vector.dy * scaleY
+            );
+        }
+        noStroke();
+        fill(255, 210, 60);
+        textSize(11);
+        textAlign(LEFT, TOP);
+        text(
+            pair.flow.matched + "/" + pair.flow.total + " blocks matched in " +
+            Math.round(pair.flow.millis) + " ms",
+            x + 4,
+            this.panelTop + 4
+        );
+        pop();
     }
 
     /**
@@ -362,7 +412,22 @@ class PanoramaScreen extends Screen {
         textSize(34);
         textStyle(BOLD);
         // At the foot of the panel, clear of a vertical arrow.
-        text(pair.motion.label, centreX, y + h - 40);
+        text(pair.motion.label, centreX, y + h - 62);
+
+        textStyle(NORMAL);
+        textSize(14);
+        fill(160);
+        let agreement = "press F for the second estimate";
+        if (pair.flowMotion) {
+            agreement = pair.flowMotion.label === pair.motion.label
+                ? "block flow agrees"
+                : "block flow says " + pair.flowMotion.label;
+        }
+        text(
+            pair.motion.angle + " degrees, shift " +
+            pair.motion.distance.toFixed(1) + " px, " + agreement,
+            centreX, y + h - 26
+        );
         pop();
     }
 
@@ -406,9 +471,20 @@ class PanoramaScreen extends Screen {
             const correct = pair.motion.label === pair.expected;
             fill(correct ? color(120, 220, 140) : color(240, 130, 130));
             text(
-                "expected " + pair.expected + "   detected " +
+                "expected " + pair.expected + "   centroid " +
                 pair.motion.label + (correct ? "   match" : "   mismatch"),
                 430, y
+            );
+        }
+        if (pair.flowMotion) {
+            const flowCorrect = pair.flowMotion.label === pair.expected;
+            fill(flowCorrect ? color(120, 220, 140) : color(240, 130, 130));
+            text(
+                "block flow " + pair.flowMotion.label +
+                "   dx " + pair.flowMotion.dx.toFixed(1) +
+                "   dy " + pair.flowMotion.dy.toFixed(1) +
+                (flowCorrect ? "   match" : "   mismatch"),
+                430, y + 23
             );
         }
         pop();
@@ -455,6 +531,6 @@ class PanoramaScreen extends Screen {
         if (this.currentStage() === "idle") return "[P] panorama screen";
         if (this.pairs.length === 0) return "[P] panorama  [I] load pairs";
         return "[I] pairs  [G] grey  [E] edges  [T] threshold  " +
-            "[N] centroid  [D] arrow";
+            "[N] centroid  [D] arrow  [F] block flow";
     }
 }

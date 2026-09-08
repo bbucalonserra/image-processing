@@ -35,10 +35,36 @@ class MaskRefiner {
      * @return {Uint8Array} Alpha channel, 0 background to 255 foreground.
      */
     refine(mask, w, h) {
-        let refined = this.keepBorderConnected(mask, w, h);
-        refined = this.removeSmallIslands(refined, w, h);
+        return this.refineWithCounts(mask, w, h).alpha;
+    }
+
+    /**
+     * Same chain as refine, and also reports how many pixels the threshold
+     * called background and how many of those were not joined to the border.
+     * The second figure is the part of the subject a threshold would have
+     * removed on its own, which is what the two colour spaces are compared on.
+     * @param {Uint8Array} mask - 1 where the threshold called background.
+     * @param {number} w - Mask width in pixels.
+     * @param {number} h - Mask height in pixels.
+     * @return {object} {alpha, thresholdBackground, reclaimed}.
+     */
+    refineWithCounts(mask, w, h) {
+        const connected = this.keepBorderConnected(mask, w, h);
+
+        let thresholdBackground = 0;
+        let connectedBackground = 0;
+        for (let i = 0; i < mask.length; i++) {
+            if (mask[i] === 1) thresholdBackground++;
+            if (connected[i] === 1) connectedBackground++;
+        }
+
+        let refined = this.removeSmallIslands(connected, w, h);
         refined = this.growBackground(refined, w, h);
-        return this.feather(this.toAlpha(refined), w, h);
+        return {
+            alpha: this.feather(this.toAlpha(refined), w, h),
+            thresholdBackground: thresholdBackground,
+            reclaimed: thresholdBackground - connectedBackground
+        };
     }
 
     /**

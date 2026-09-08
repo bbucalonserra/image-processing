@@ -64,13 +64,32 @@ class ThresholdSettings {
     static get TABLE() {
         return [
             [1, 60, 12, 70],      // 1.jpg - dim warm grey wall.
-            [1, 60, 6, 94],       // 2.jpg - white wall, white shirt.
-            [0, 200, 200, 200],   // 3.jpg - light grey wall with a gradient.
+            [0, 238, 238, 238],   // 2.jpg - white wall, white shirt.
+            [1, 60, 10, 72],      // 3.jpg - light grey wall with a gradient.
             [0, 240, 240, 240],   // 4.jpg - white cut out.
             [0, 238, 238, 238],   // 5.jpg - white backdrop.
             [0, 238, 238, 238],   // 6.jpg - white backdrop.
             [1, 60, 6, 97],       // 7.jpg - white wall, white shirt.
             [1, 60, 8, 90]        // 8.jpg - warm off white wall.
+        ];
+    }
+
+    /**
+     * The best row found in the colour space that was not chosen, one per
+     * image. Keeping it lets the app show the comparison the brief asks for
+     * instead of only the winner.
+     * @return {Array<Array<number>>} Same format as TABLE.
+     */
+    static get ALTERNATIVES() {
+        return [
+            [0, 190, 190, 190],   // 1.jpg - best RGB attempt.
+            [1, 60, 6, 94],       // 2.jpg - best HSB attempt.
+            [0, 200, 200, 200],   // 3.jpg - best RGB attempt.
+            [1, 60, 6, 98],       // 4.jpg - best HSB attempt.
+            [1, 60, 6, 98],       // 5.jpg - best HSB attempt.
+            [1, 60, 6, 98],       // 6.jpg - best HSB attempt.
+            [0, 238, 238, 238],   // 7.jpg - best RGB attempt.
+            [0, 215, 215, 215]    // 8.jpg - best RGB attempt.
         ];
     }
 
@@ -84,10 +103,25 @@ class ThresholdSettings {
 
     /**
      * @param {number} index - Image index.
-     * @return {string} The row written out for the HUD.
+     * @return {Array<number>} The row of the colour space not chosen.
+     */
+    static alternativeFor(index) {
+        return ThresholdSettings.ALTERNATIVES[index];
+    }
+
+    /**
+     * @param {number} index - Image index.
+     * @return {string} The chosen row written out for the HUD.
      */
     static describe(index) {
-        const row = ThresholdSettings.TABLE[index];
+        return ThresholdSettings.describeRow(ThresholdSettings.TABLE[index]);
+    }
+
+    /**
+     * @param {Array<number>} row - A [colourSpace, c1, c2, c3] row.
+     * @return {string} The row written out for the HUD.
+     */
+    static describeRow(row) {
         if (row[0] === 1) {
             return "HSB  hue +/-" + row[1] + "  sat <= " + row[2] +
                 "  bri >= " + row[3];

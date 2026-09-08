@@ -25,8 +25,12 @@ class FramePair {
         this.binary = [null, null];
         /** @type {Array<object|null>} Centroid of each thresholded frame. */
         this.centroids = [null, null];
-        /** @type {object|null} Motion reported for this pair. */
+        /** @type {object|null} Motion reported by the centroid method. */
         this.motion = null;
+        /** @type {object|null} Raw output of the block matching estimator. */
+        this.flow = null;
+        /** @type {object|null} Motion reported by the block matching method. */
+        this.flowMotion = null;
         /** @type {number} Threshold the cached binaries were built with. */
         this.binaryThreshold = -1;
     }
@@ -101,5 +105,19 @@ class FramePair {
         if (this.motion) return;
         if (!this.centroids[0] || !this.centroids[1]) return;
         this.motion = estimator.estimate(this.centroids[0], this.centroids[1]);
+    }
+
+    /**
+     * Runs the block matching estimator on the greyscale frames. It does not
+     * depend on the threshold, so the result is computed once and kept.
+     * @param {BlockFlowEstimator} flowEstimator - Block matching estimator.
+     * @param {MotionEstimator} estimator - Classifier for the shift it finds.
+     * @return {void}
+     */
+    buildFlow(flowEstimator, estimator) {
+        if (this.flow) return;
+        this.buildGrey();
+        this.flow = flowEstimator.estimate(this.grey[0], this.grey[1]);
+        this.flowMotion = estimator.classify(this.flow.dx, this.flow.dy);
     }
 }

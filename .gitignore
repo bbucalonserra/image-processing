@@ -25,4 +25,7 @@ build/
 scratch/
 tmp/
 _harness.*
+_check.*
+_cut.*
+_drive.*
 *.log

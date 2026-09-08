@@ -5,7 +5,7 @@
  */
 class ScrollingBackground {
     /**
-     * @param {p5.Image} image - Backdrop, seamless left to right.
+     * @param {p5.Graphics} image - Backdrop, seamless left to right.
      * @param {number} speed - Pixels per second.
      */
     constructor(image, speed) {
