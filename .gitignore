@@ -1,0 +1,28 @@
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*~
+
+# Node tooling, only used for local servers or linting
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Build output and submission archives
+dist/
+build/
+*.zip
+
+# Local scratch work and screenshots taken while testing
+scratch/
+tmp/
+_harness.*
+*.log
