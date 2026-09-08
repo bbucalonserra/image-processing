@@ -1,14 +1,14 @@
 /**
- * Class running Task 1. It owns the four stages the brief asks for, keyed by
- * c to open the carousel, l to load and process the images, and s to start the
- * animation, and it draws the stage panel and the scrolling row of cards.
+ * Task 1. Holds the stages keyed by c to open the carousel, l to load and
+ * process the images and s to start the animation, and draws the stage panel
+ * and the row of cards.
  */
 class CarouselScreen extends Screen {
     /**
      * @param {Array<p5.Image>} sourceImages - The eight provided images.
-     * @param {p5.Image} backdrop - Image used behind the featured subject.
-     * @param {number} panelTop - Height at which the stage panel begins.
-     * @param {number} panelHeight - Height of the stage panel in pixels.
+     * @param {p5.Image} backdrop - Image drawn behind the featured subject.
+     * @param {number} panelTop - Top of the stage panel.
+     * @param {number} panelHeight - Stage panel height in pixels.
      */
     constructor(sourceImages, backdrop, panelTop, panelHeight) {
         super("TASK 1 - STREAMING CAROUSEL", [
@@ -23,7 +23,7 @@ class CarouselScreen extends Screen {
         this.remover = new BackgroundRemover(new MaskRefiner(60, 1, 1));
         /** @type {Carousel} The scrolling row of processed entries. */
         this.carousel = new Carousel(190, 18, 26);
-        /** @type {AnimationCycle} Fade and zoom timing of the featured entry. */
+        /** @type {AnimationCycle} Fade and zoom timing of the entry. */
         this.cycle = new AnimationCycle(5200, 0.72, 1.15, 0.25);
         /** @type {ScrollingBackground} Backdrop travelling left to right. */
         this.background = new ScrollingBackground(backdrop, 34);
@@ -38,9 +38,9 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Handles the c, l and s keys of Task 1.
-     * @param {string} pressedKey - The key character, already lower cased.
-     * @param {number} pressedCode - The p5 key code.
+     * Handles the c, l and s keys.
+     * @param {string} pressedKey - Key character, lower cased.
+     * @param {number} pressedCode - p5 key code.
      * @return {void}
      */
     handleKey(pressedKey, pressedCode) {
@@ -57,9 +57,9 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Processes every provided image through its own threshold row, exactly as
-     * the brief describes: walk the settings array, read the colour space and
-     * the three values, and cut the background out with them.
+     * Processes every image through its own threshold row: walk the settings
+     * array, read the colour space and the three values, cut the background
+     * out with them.
      * @return {void}
      */
     loadItems() {
@@ -85,12 +85,12 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Advances the load, the scrolling row and the animation sequence.
+     * Advances the load, the card row and the animation.
      * @return {void}
      */
     update() {
-        // The notice is given one frame on screen before the processing runs,
-        // because the loop is blocked while the pixels are being worked on.
+        // The notice gets one frame on screen before processing starts,
+        // because the loop is blocked while the pixels are worked on.
         if (this.pendingLoad) {
             if (this.noticeFrames > 0) {
                 this.loadItems();
@@ -109,7 +109,7 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Draws the stage panel, then the scrolling row of cards.
+     * Draws the stage panel, then the row of cards.
      * @return {void}
      */
     draw() {
@@ -123,8 +123,8 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Draws the featured area: the moving backdrop, the animated subject and
-     * the animated caption, or the prompt for the stage still to be reached.
+     * Draws the backdrop, the subject and the caption, or the prompt for the
+     * stage not yet reached.
      * @return {void}
      */
     drawPanel() {
@@ -174,12 +174,12 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Draws the cut out subject travelling left to right while it fades and
-     * zooms. The position and the size are worked out as numbers and handed to
-     * image(), so the sketch never calls translate().
-     * @param {CarouselItem} item - The featured entry.
+     * Draws the subject travelling left to right while it fades and zooms.
+     * Position and size are computed as numbers and passed to image(), so
+     * translate() is not used.
+     * @param {CarouselItem} item - Featured entry.
      * @param {number} progress - Position in the stage, 0 to 1.
-     * @param {number} alphaValue - Opacity for this frame, 0 to 255.
+     * @param {number} alphaValue - Opacity, 0 to 255.
      * @param {number} scaleFactor - Zoom for this frame.
      * @return {void}
      */
@@ -202,8 +202,8 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Draws a prompt in the middle of the stage panel.
-     * @param {string} message - The prompt to show.
+     * Draws a prompt on the stage panel.
+     * @param {string} message - Prompt to show.
      * @return {void}
      */
     drawNotice(message) {
@@ -218,7 +218,7 @@ class CarouselScreen extends Screen {
 
     /**
      * Draws the threshold row and animation phase of the featured entry.
-     * @param {CarouselItem} item - The featured entry.
+     * @param {CarouselItem} item - Featured entry.
      * @return {void}
      */
     drawStatus(item) {
@@ -238,7 +238,7 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * @return {string} One line of guidance for the header.
+     * @return {string} Keys available now, for the header.
      */
     hint() {
         if (this.currentStage() === "idle") return "[C] carousel";

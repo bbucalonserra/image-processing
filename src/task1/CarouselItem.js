@@ -1,10 +1,9 @@
-/** Class holding one carousel entry and how it is drawn as a thumbnail. */
+/** One carousel entry and its card. */
 class CarouselItem {
     /**
-     * @param {p5.Image} foreground - The provided image with its backdrop cut
-     *     out, so only the person is left.
+     * @param {p5.Image} foreground - Provided image with its backdrop cut out.
      * @param {string} caption - Title shown with the entry.
-     * @param {string} settingLabel - Readable form of its threshold row.
+     * @param {string} settingLabel - Its threshold row written out.
      */
     constructor(foreground, caption, settingLabel) {
         this.foreground = foreground;
@@ -13,12 +12,12 @@ class CarouselItem {
     }
 
     /**
-     * Draws the entry as a card inside a box, keeping its aspect ratio.
+     * Draws the card, keeping the image aspect ratio.
      * @param {number} x - Left edge of the card.
      * @param {number} y - Top edge of the card.
      * @param {number} boxW - Card width in pixels.
      * @param {number} boxH - Card height in pixels.
-     * @param {boolean} featured - Whether this entry is the one on the stage.
+     * @param {boolean} featured - Whether this entry is on the stage.
      * @return {void}
      */
     draw(x, y, boxW, boxH, featured) {
@@ -52,7 +51,7 @@ class CarouselItem {
     }
 
     /**
-     * Works out the largest size that fits a box without distorting the image.
+     * Largest size that fits a box without distorting the image.
      * @param {number} boxW - Available width in pixels.
      * @param {number} boxH - Available height in pixels.
      * @return {object} {w, h} of the fitted image.

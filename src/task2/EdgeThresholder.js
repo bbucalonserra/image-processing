@@ -1,14 +1,13 @@
 /**
- * Class forcing the edge output to pick sides, so that only the strongest
- * outlines survive. This is the threshold filter of week 15, driven here by
- * the on screen slider.
+ * Forces the edge output to pick sides so only the strongest outlines survive.
+ * This is the threshold filter of week 15, driven by the on screen slider.
  */
 class EdgeThresholder {
     /**
      * Builds a black and white copy of an edge image.
-     * @param {p5.Image} edges - The edge output of EdgeDetector.
-     * @param {number} threshold - Edge strength a pixel must reach, 0 to 255.
-     * @return {p5.Image} Image holding white outlines on black.
+     * @param {p5.Image} edges - Output of EdgeDetector.
+     * @param {number} threshold - Strength a pixel must reach, 0 to 255.
+     * @return {p5.Image} White outlines on black.
      */
     static apply(edges, threshold) {
         const w = edges.width;

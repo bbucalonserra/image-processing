@@ -52,11 +52,11 @@
 const CANVAS_W = 1280;
 const CANVAS_H = 720;
 
-// Task 1 stage panel, measured from below the header.
+// Task 1 stage panel, below the header.
 const STAGE_TOP = 86;
 const STAGE_HEIGHT = 384;
 
-// Task 2 frame panels, which need more room for their labels.
+// Task 2 frame panels, lower to leave room for their labels.
 const FRAME_TOP = 112;
 
 /** @type {AppController} */
@@ -64,14 +64,14 @@ let appController;
 
 /** @type {Array<p5.Image>} The eight provided images of Task 1. */
 let sourceImages = [];
-/** @type {Array<Array<p5.Image>>} One [frameA, frameB] entry per Task 2 pair. */
+/** @type {Array<Array<p5.Image>>} A [frameA, frameB] entry per pair. */
 let pairImages = [];
-/** @type {p5.Image} Backdrop scrolling behind the featured subject. */
+/** @type {p5.Image} Backdrop behind the featured subject. */
 let backdropImage;
 
 /**
- * Loads every image before setup runs, so no draw call ever meets a half
- * loaded file (week 12).
+ * Loads every image before setup runs, so no draw call meets a half loaded
+ * file (week 12).
  * @return {void}
  */
 function preload() {
@@ -94,8 +94,8 @@ function preload() {
  */
 function setup() {
     createCanvas(CANVAS_W, CANVAS_H);
-    // Required before any direct pixel work, so that one pixel of the image is
-    // one pixel of the array on high density screens (week 13).
+    // Required before direct pixel work: on a high density screen one image
+    // pixel would otherwise cover several array entries (week 13).
     pixelDensity(1);
     imageMode(CORNER);
 

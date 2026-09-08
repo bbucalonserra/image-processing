@@ -1,27 +1,24 @@
 /**
- * Class holding the per image threshold table required by the brief.
+ * Per image threshold table required by the brief.
  *
- * Every entry follows thresholds[i] = [colourSpace, c1, c2, c3], where
- * colourSpace is 0 for RGB and 1 for HSB. The three remaining values are the
- * threshold values of the chosen colour space:
+ * thresholds[i] = [colourSpace, c1, c2, c3], colourSpace 0 for RGB and 1 for
+ * HSB. The other three are the threshold values of that colour space:
  *
- *   RGB (0): c1, c2, c3 are the minimum red, green and blue a pixel needs in
- *            order to be treated as background.
- *   HSB (1): c1 is the largest allowed hue distance from the background hue
- *            sampled at the top corners, c2 is the largest allowed saturation
- *            and c3 is the smallest allowed brightness.
+ *   RGB (0): c1, c2, c3 are the minimum red, green and blue of a background
+ *            pixel.
+ *   HSB (1): c1 is the hue tolerance around the backdrop hue sampled at the
+ *            top corners, c2 the maximum saturation, c3 the minimum
+ *            brightness.
  *
- * Both colour spaces were tried on all eight images. RGB wins where the
- * backdrop is a clean white cut out, because a single limit per channel is
- * enough. HSB wins where the backdrop is a dim or tinted grey (image 1), or
- * where the subject wears white or off white clothing (images 2 and 7): there
- * the saturation gate keeps the garment while the brightness gate still drops
- * the backdrop, which an RGB limit cannot separate.
+ * Both colour spaces were measured on all eight images. RGB is used where the
+ * backdrop is a clean white cut out, since one limit per channel separates it.
+ * HSB is used on image 1, whose wall is dim and tinted, and on images 2 and 7,
+ * where the subject wears white: there the saturation limit keeps the garment
+ * while the brightness limit still drops the wall, which RGB cannot do.
  */
 class ThresholdSettings {
     /**
-     * Saturation below which the hue of a pixel is unstable, so the hue test
-     * is skipped and only saturation and brightness decide.
+     * Saturation below which hue is unstable, so the hue test is skipped.
      * @return {number} Saturation limit, 0 to 100.
      */
     static get NEUTRAL_SATURATION() {
@@ -29,8 +26,7 @@ class ThresholdSettings {
     }
 
     /**
-     * The eight source files, in carousel order.
-     * @return {Array<string>} Relative paths of the provided images.
+     * @return {Array<string>} Paths of the eight provided images.
      */
     static get FILES() {
         return [
@@ -46,7 +42,6 @@ class ThresholdSettings {
     }
 
     /**
-     * Caption shown next to each image in the carousel.
      * @return {Array<string>} One caption per image.
      */
     static get CAPTIONS() {
@@ -63,26 +58,25 @@ class ThresholdSettings {
     }
 
     /**
-     * The threshold table itself, one row per image and in the same order as
-     * FILES. Values were found by testing both colour spaces on every image.
+     * The table, one row per image, in the same order as FILES.
      * @return {Array<Array<number>>} thresholds[i] = [colourSpace, c1, c2, c3].
      */
     static get TABLE() {
         return [
-            [1, 60, 12, 70],      // 1.jpg - dim warm grey studio wall.
-            [1, 60, 6, 96],       // 2.jpg - white wall behind a white shirt.
+            [1, 60, 12, 70],      // 1.jpg - dim warm grey wall.
+            [1, 60, 6, 94],       // 2.jpg - white wall, white shirt.
             [0, 200, 200, 200],   // 3.jpg - light grey wall with a gradient.
-            [0, 240, 240, 240],   // 4.jpg - pure white cut out.
-            [0, 238, 238, 238],   // 5.jpg - pure white studio backdrop.
-            [0, 238, 238, 238],   // 6.jpg - pure white studio backdrop.
-            [1, 60, 6, 97],       // 7.jpg - white wall behind a white shirt.
+            [0, 240, 240, 240],   // 4.jpg - white cut out.
+            [0, 238, 238, 238],   // 5.jpg - white backdrop.
+            [0, 238, 238, 238],   // 6.jpg - white backdrop.
+            [1, 60, 6, 97],       // 7.jpg - white wall, white shirt.
             [1, 60, 8, 90]        // 8.jpg - warm off white wall.
         ];
     }
 
     /**
      * @param {number} index - Image index.
-     * @return {Array<number>} The [colourSpace, c1, c2, c3] row for that image.
+     * @return {Array<number>} The [colourSpace, c1, c2, c3] row.
      */
     static settingFor(index) {
         return ThresholdSettings.TABLE[index];
@@ -90,7 +84,7 @@ class ThresholdSettings {
 
     /**
      * @param {number} index - Image index.
-     * @return {string} Readable summary of the row, used by the on screen HUD.
+     * @return {string} The row written out for the HUD.
      */
     static describe(index) {
         const row = ThresholdSettings.TABLE[index];

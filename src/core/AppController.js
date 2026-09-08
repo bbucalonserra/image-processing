@@ -1,23 +1,22 @@
 /**
- * Class routing the application between the two tasks. Key 1 loads Task 1 and
- * key 2 loads Task 2, as the brief requires, and every other key is passed to
- * whichever screen is on show.
+ * Routes the app between the two tasks. Key 1 selects Task 1 and key 2 selects
+ * Task 2, as the brief requires. Any other key goes to the screen on show.
  */
 class AppController {
     /**
-     * @param {CarouselScreen} carouselScreen - The Task 1 screen.
-     * @param {PanoramaScreen} panoramaScreen - The Task 2 screen.
+     * @param {CarouselScreen} carouselScreen - Task 1 screen.
+     * @param {PanoramaScreen} panoramaScreen - Task 2 screen.
      */
     constructor(carouselScreen, panoramaScreen) {
-        /** @type {object} The screens, keyed by the number that selects them. */
+        /** @type {object} Screens keyed by the number that selects them. */
         this.screens = { "1": carouselScreen, "2": panoramaScreen };
-        /** @type {Screen|null} The screen currently on show. */
+        /** @type {Screen|null} Screen on show. */
         this.activeScreen = null;
     }
 
     /**
-     * Brings one task on screen, telling the outgoing screen it is leaving so
-     * it can put away anything that lives outside the canvas.
+     * Puts one task on screen. The outgoing screen is told it is leaving so it
+     * can hide anything it owns outside the canvas.
      * @param {string} taskKey - "1" or "2".
      * @return {void}
      */
@@ -31,9 +30,9 @@ class AppController {
     }
 
     /**
-     * Routes a key press to the task switcher or to the active screen.
-     * @param {string} pressedKey - The raw key character.
-     * @param {number} pressedCode - The p5 key code.
+     * Sends a key press to the task switcher or to the active screen.
+     * @param {string} pressedKey - Raw key character.
+     * @param {number} pressedCode - p5 key code.
      * @return {void}
      */
     handleKey(pressedKey, pressedCode) {
@@ -56,7 +55,7 @@ class AppController {
 
     /**
      * Draws the header and the active screen, or the opening prompt when no
-     * task has been chosen yet.
+     * task has been selected.
      * @return {void}
      */
     draw() {
@@ -82,7 +81,7 @@ class AppController {
     }
 
     /**
-     * Draws the title bar holding the task name and the keys it accepts.
+     * Draws the title bar with the task name and the keys available now.
      * @return {void}
      */
     drawHeader() {

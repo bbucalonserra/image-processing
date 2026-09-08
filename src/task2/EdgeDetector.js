@@ -1,13 +1,12 @@
 /**
- * Class producing an edge image from a greyscale frame. The two Sobel passes
- * of week 15 are run separately, one for the vertical edges and one for the
- * horizontal ones, and the two responses are then added together.
+ * Edge image from a greyscale frame. The two Sobel passes of week 15 are run
+ * separately, one for vertical edges and one for horizontal, then added.
  */
 class EdgeDetector {
     /**
      * Builds the edge output for a greyscale frame.
-     * @param {p5.Image} grey - Greyscale frame produced by GreyscaleFilter.
-     * @return {p5.Image} Greyscale image whose bright pixels are the edges.
+     * @param {p5.Image} grey - Frame produced by GreyscaleFilter.
+     * @return {p5.Image} Image whose bright pixels are the edges.
      */
     static detect(grey) {
         const w = grey.width;
@@ -23,8 +22,8 @@ class EdgeDetector {
         for (let y = 0; y < h; y++) {
             for (let x = 0; x < w; x++) {
                 const cell = x + y * w;
-                // Each response is remapped from its own range before the two
-                // are combined, and the sum is clamped to a legal pixel value.
+                // Each response is remapped before the two are added, and
+                // the sum is clamped to a legal pixel value.
                 const edgeX = map(
                     Math.abs(gx[cell]), 0, ConvolutionFilter.SOBEL_RANGE, 0, 255
                 );

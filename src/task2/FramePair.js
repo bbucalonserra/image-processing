@@ -1,15 +1,15 @@
 /**
- * Class holding one pair of frames and every image derived from it. Each stage
- * of the pipeline is computed once and cached, so pressing a key again or
- * changing pair only redoes the work that is actually missing.
+ * One pair of frames and everything derived from it. Each stage is computed
+ * once and cached, so pressing a key again or changing pair only redoes the
+ * work that is missing.
  */
 class FramePair {
     /**
-     * @param {string} label - Name of the pair shown on screen.
-     * @param {p5.Image} frameA - The first frame.
-     * @param {p5.Image} frameB - The second frame.
-     * @param {string} expected - Direction the pair was built to show, used to
-     *     check the estimate on screen.
+     * @param {string} label - Pair name shown on screen.
+     * @param {p5.Image} frameA - First frame.
+     * @param {p5.Image} frameB - Second frame.
+     * @param {string} expected - Direction the pair was built to show, checked
+     *     against the estimate on screen.
      */
     constructor(label, frameA, frameB, expected) {
         this.label = label;
@@ -27,13 +27,13 @@ class FramePair {
         this.centroids = [null, null];
         /** @type {object|null} Motion reported for this pair. */
         this.motion = null;
-        /** @type {number} Threshold the cached binary images were built with. */
+        /** @type {number} Threshold the cached binaries were built with. */
         this.binaryThreshold = -1;
     }
 
     /**
      * @param {number} slot - 0 for Frame A, 1 for Frame B.
-     * @return {p5.Image} The original frame in that slot.
+     * @return {p5.Image} Original frame in that slot.
      */
     frame(slot) {
         return slot === 0 ? this.frameA : this.frameB;
@@ -50,7 +50,7 @@ class FramePair {
     }
 
     /**
-     * Runs the edge filter over both greyscale frames.
+     * Runs the edge filter on both greyscale frames.
      * @return {void}
      */
     buildEdges() {
@@ -61,8 +61,8 @@ class FramePair {
     }
 
     /**
-     * Thresholds both edge images, redoing the work when the slider moved.
-     * @param {number} threshold - Edge strength a pixel must reach.
+     * Thresholds both edge images, redone when the slider value changed.
+     * @param {number} threshold - Strength a pixel must reach.
      * @return {void}
      */
     buildBinary(threshold) {
@@ -72,15 +72,15 @@ class FramePair {
         this.binary[1] = EdgeThresholder.apply(this.edges[1], threshold);
         this.binaryThreshold = threshold;
 
-        // The centroids belong to the thresholded pixels, so they are dropped
-        // whenever the threshold changes.
+        // The centroids come from the thresholded pixels, so they are
+        // dropped whenever the threshold changes.
         this.centroids = [null, null];
         this.motion = null;
     }
 
     /**
      * Computes the centroid of both thresholded frames.
-     * @param {number} threshold - Edge strength a pixel must reach.
+     * @param {number} threshold - Strength a pixel must reach.
      * @return {void}
      */
     buildCentroids(threshold) {
@@ -92,8 +92,8 @@ class FramePair {
 
     /**
      * Estimates the motion between the two centroids.
-     * @param {number} threshold - Edge strength a pixel must reach.
-     * @param {MotionEstimator} estimator - The estimator to use.
+     * @param {number} threshold - Strength a pixel must reach.
+     * @param {MotionEstimator} estimator - Estimator to use.
      * @return {void}
      */
     buildMotion(threshold, estimator) {

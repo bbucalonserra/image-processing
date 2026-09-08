@@ -1,15 +1,15 @@
 /**
- * Class driving the animation sequence the brief asks for: fade in, zoom in,
- * fade out, then fade in, zoom out, fade out, and so on. One pass through the
- * three phases is called a stage, and the zoom direction flips at the end of
- * every stage. The alpha and the scale are read back as plain numbers so the
- * screen can draw with image() and text() alone, without translate().
+ * Drives the sequence the brief asks for: fade in, zoom in, fade out, then fade
+ * in, zoom out, fade out, repeating. One pass through the three phases is a
+ * stage, and the zoom direction flips at the end of each stage. Alpha and scale
+ * are returned as numbers, so the screen draws with image() and text() and
+ * never calls translate().
  */
 class AnimationCycle {
     /**
-     * @param {number} stageDuration - Length of one stage in milliseconds.
-     * @param {number} minScale - Scale at the small end of the zoom.
-     * @param {number} maxScale - Scale at the large end of the zoom.
+     * @param {number} stageDuration - Stage length in milliseconds.
+     * @param {number} minScale - Small end of the zoom.
+     * @param {number} maxScale - Large end of the zoom.
      * @param {number} fadeFraction - Share of the stage spent fading, 0 to 0.5.
      */
     constructor(stageDuration, minScale, maxScale, fadeFraction) {
@@ -24,7 +24,7 @@ class AnimationCycle {
     }
 
     /**
-     * Restarts the sequence at the beginning of a zoom in stage.
+     * Restarts at the beginning of a zoom in stage.
      * @return {void}
      */
     restart() {
@@ -33,8 +33,8 @@ class AnimationCycle {
     }
 
     /**
-     * Advances the timer by one frame. The step is capped so a browser tab
-     * left in the background does not skip whole stages on its return.
+     * Advances the timer by one frame. The step is capped so a background tab
+     * does not skip whole stages when it returns.
      * @return {boolean} Whether a stage finished on this frame.
      */
     update() {
@@ -47,7 +47,7 @@ class AnimationCycle {
     }
 
     /**
-     * @return {number} Position within the current stage, 0 to 1.
+     * @return {number} Position in the current stage, 0 to 1.
      */
     progress() {
         return this.elapsed / this.stageDuration;
@@ -68,8 +68,8 @@ class AnimationCycle {
     }
 
     /**
-     * @return {number} Scale for the current frame, running from the small to
-     *     the large end on a zoom in stage and the other way on a zoom out.
+     * @return {number} Scale for the current frame: small to large on a zoom
+     *     in stage, large to small on a zoom out.
      */
     scaleFactor() {
         const p = this.progress();
@@ -79,7 +79,7 @@ class AnimationCycle {
     }
 
     /**
-     * @return {string} Name of the phase in progress, for the HUD.
+     * @return {string} Phase in progress, for the HUD.
      */
     phaseName() {
         const p = this.progress();

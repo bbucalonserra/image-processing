@@ -1,21 +1,21 @@
 /**
- * Class turning the two centroids into one of the eight motion directions.
- * The shift is dx = Cx2 - Cx1 and dy = Cy2 - Cy1, and each axis is only
- * counted once it clears a dead zone, which stops the noise in the edge image
- * from reporting a diagonal when the motion is purely horizontal or vertical.
+ * Turns two centroids into one of the eight directions. The shift is
+ * dx = Cx2 - Cx1 and dy = Cy2 - Cy1, and an axis only counts once it clears a
+ * dead zone, which stops noise in the edge image reporting a diagonal when the
+ * motion is horizontal or vertical.
  */
 class MotionEstimator {
     /**
-     * @param {number} deadZone - Shift in pixels an axis must clear to count.
+     * @param {number} deadZone - Pixels an axis must clear to count.
      */
     constructor(deadZone) {
         this.deadZone = deadZone;
     }
 
     /**
-     * Angles the arrow is drawn at, in degrees, measured the way the screen
-     * runs: x grows to the right and y grows downwards.
-     * @return {object} Angle in degrees for every direction label.
+     * Arrow angles in degrees, measured the way the screen runs: x grows to
+     * the right and y grows downwards.
+     * @return {object} Angle for every direction label.
      */
     static get ANGLES() {
         return {
@@ -34,8 +34,8 @@ class MotionEstimator {
      * Compares the centroid of Frame A with the centroid of Frame B.
      * @param {object} centroidA - {x, y} centroid of Frame A.
      * @param {object} centroidB - {x, y} centroid of Frame B.
-     * @return {object} {dx, dy, label, angle, distance} for the pair, with a
-     *     label of NONE when neither axis clears the dead zone.
+     * @return {object} {dx, dy, label, angle, distance}. The label is NONE
+     *     when neither axis clears the dead zone.
      */
     estimate(centroidA, centroidB) {
         const dx = centroidB.x - centroidA.x;
@@ -58,8 +58,8 @@ class MotionEstimator {
             dx: dx,
             dy: dy,
             label: label,
-            // The arrow follows the reported direction rather than the raw
-            // vector, so the overlay and the label can never disagree.
+            // The arrow follows the reported label, not the raw vector, so
+            // overlay and label cannot disagree.
             angle: label === "NONE" ? 0 : MotionEstimator.ANGLES[label],
             distance: Math.sqrt(dx * dx + dy * dy)
         };

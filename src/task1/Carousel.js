@@ -1,11 +1,8 @@
-/**
- * Class holding the processed entries and scrolling them horizontally, the
- * row of covers a streaming service shows under its feature panel.
- */
+/** Holds the processed entries and scrolls them horizontally. */
 class Carousel {
     /**
-     * @param {number} cardWidth - Width of one card in pixels.
-     * @param {number} cardGap - Gap between two cards in pixels.
+     * @param {number} cardWidth - Card width in pixels.
+     * @param {number} cardGap - Gap between cards in pixels.
      * @param {number} speed - Scroll speed in pixels per second.
      */
     constructor(cardWidth, cardGap, speed) {
@@ -22,7 +19,7 @@ class Carousel {
 
     /**
      * Replaces the row with a new set of entries.
-     * @param {Array<CarouselItem>} items - The processed entries.
+     * @param {Array<CarouselItem>} items - Processed entries.
      * @return {void}
      */
     setItems(items) {
@@ -32,14 +29,14 @@ class Carousel {
     }
 
     /**
-     * @return {boolean} Whether any entry has been loaded yet.
+     * @return {boolean} Whether entries have been loaded.
      */
     isLoaded() {
         return this.items.length > 0;
     }
 
     /**
-     * @return {CarouselItem|null} The entry currently on the stage.
+     * @return {CarouselItem|null} Entry on the stage.
      */
     featuredItem() {
         if (!this.isLoaded()) return null;
@@ -47,7 +44,7 @@ class Carousel {
     }
 
     /**
-     * Moves the stage on to the next entry, wrapping at the end of the row.
+     * Moves to the next entry, wrapping at the end of the row.
      * @return {void}
      */
     advanceFeatured() {
@@ -56,7 +53,7 @@ class Carousel {
     }
 
     /**
-     * Advances the smooth scroll of the row and wraps it by one card pitch.
+     * Advances the scroll and wraps it by one card pitch.
      * @return {void}
      */
     update() {
@@ -67,8 +64,8 @@ class Carousel {
     }
 
     /**
-     * Draws the scrolling row inside a strip, repeating the entries so the row
-     * never runs out of cards on either side.
+     * Draws the row inside a strip, repeating the entries so cards never run
+     * out on either side.
      * @param {number} x - Left edge of the strip.
      * @param {number} y - Top edge of the strip.
      * @param {number} stripW - Strip width in pixels.
@@ -103,9 +100,9 @@ class Carousel {
     }
 
     /**
-     * Maps a visible slot onto an entry, so the row repeats endlessly.
-     * @param {number} slot - Slot position counted from the left.
-     * @return {number} Index of the entry to draw in that slot.
+     * Maps a slot onto an entry, which makes the row repeat.
+     * @param {number} slot - Slot position from the left.
+     * @return {number} Index of the entry drawn in that slot.
      */
     itemIndexForSlot(slot) {
         const count = this.items.length;

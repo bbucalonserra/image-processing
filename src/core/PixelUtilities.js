@@ -1,12 +1,10 @@
-/** Class holding the low level pixel helpers shared by both tasks. */
+/** Pixel helpers shared by both tasks. */
 class PixelUtilities {
     /**
-     * Converts a 2D pixel coordinate into an index in the flat RGBA array.
-     * The x + y * width formula followed by the multiplication by the four
-     * channels is the conversion demonstrated in week 13.
+     * Converts a 2D coordinate into an index in the RGBA array (week 13).
      * @param {number} x - Column of the pixel.
      * @param {number} y - Row of the pixel.
-     * @param {number} imageWidth - Width of the image in pixels.
+     * @param {number} imageWidth - Image width in pixels.
      * @return {number} Index of the red channel of that pixel.
      */
     static pixelIndex(x, y, imageWidth) {
@@ -14,8 +12,8 @@ class PixelUtilities {
     }
 
     /**
-     * Converts a colour to a single grey level using the luma weights, which
-     * favour green because the eye is most sensitive to it (week 15).
+     * Grey level from the luma weights, which keep the original brightness
+     * because green counts more than red and blue (week 15).
      * @param {number} red - Red channel, 0 to 255.
      * @param {number} green - Green channel, 0 to 255.
      * @param {number} blue - Blue channel, 0 to 255.
@@ -26,9 +24,8 @@ class PixelUtilities {
     }
 
     /**
-     * Converts an RGB colour into hue, saturation and brightness. Written by
-     * hand instead of using the p5 colour object because a colour object per
-     * pixel is far too slow for a full image (week 13).
+     * Converts RGB to HSB. Done by hand because one p5 colour object per pixel
+     * is too slow for a full image (week 13).
      * @param {number} red - Red channel, 0 to 255.
      * @param {number} green - Green channel, 0 to 255.
      * @param {number} blue - Blue channel, 0 to 255.
@@ -58,8 +55,8 @@ class PixelUtilities {
     }
 
     /**
-     * Shortest distance between two hues on the colour wheel, so that hues on
-     * either side of 0 degrees are still recognised as neighbours.
+     * Distance between two hues on the colour wheel, wrapping at 360 so that
+     * hues either side of 0 stay neighbours.
      * @param {number} hueA - First hue in degrees.
      * @param {number} hueB - Second hue in degrees.
      * @return {number} Distance in degrees, 0 to 180.
@@ -70,10 +67,10 @@ class PixelUtilities {
     }
 
     /**
-     * Returns a scaled copy of an image, leaving the original untouched.
-     * @param {p5.Image} source - The image to copy.
-     * @param {number} maxWidth - Largest allowed width in pixels.
-     * @param {number} maxHeight - Largest allowed height in pixels.
+     * Scaled copy of an image. The original is not changed.
+     * @param {p5.Image} source - Image to copy.
+     * @param {number} maxWidth - Width limit in pixels.
+     * @param {number} maxHeight - Height limit in pixels.
      * @return {p5.Image} The scaled copy.
      */
     static scaledCopy(source, maxWidth, maxHeight) {

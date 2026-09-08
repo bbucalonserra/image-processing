@@ -1,12 +1,11 @@
 /**
- * Class applying a convolution kernel to an image, following the moving
- * weighted average described in week 15. The result is returned as raw signed
- * sums rather than pixels, because an edge kernel produces negative responses
- * that must survive until the two Sobel passes are combined.
+ * Applies a convolution kernel, the moving weighted average of week 15. The
+ * result is returned as signed sums rather than pixels, because an edge kernel
+ * gives negative responses that must survive until the two passes are added.
  */
 class ConvolutionFilter {
     /**
-     * Sobel kernel with its asymmetry running left to right, so it responds to
+     * Sobel kernel with its asymmetry left to right, so it responds to
      * vertical edges (week 15).
      * @return {Array<Array<number>>} The 3x3 kernel.
      */
@@ -19,7 +18,7 @@ class ConvolutionFilter {
     }
 
     /**
-     * Sobel kernel with its asymmetry running top to bottom, so it responds to
+     * Sobel kernel with its asymmetry top to bottom, so it responds to
      * horizontal edges (week 15).
      * @return {Array<Array<number>>} The 3x3 kernel.
      */
@@ -32,10 +31,9 @@ class ConvolutionFilter {
     }
 
     /**
-     * Largest sum a Sobel kernel can return, used to map the response back
-     * into the 0 to 255 range: the positive weights total four, and the
-     * brightest pixel is 255.
-     * @return {number} The largest possible response.
+     * Largest sum a Sobel kernel can return, used to map the response back to
+     * 0 to 255: the positive weights total four and a pixel reaches 255.
+     * @return {number} Largest possible response.
      */
     static get SOBEL_RANGE() {
         return 1020;
@@ -43,11 +41,9 @@ class ConvolutionFilter {
 
     /**
      * Convolves the red channel of a greyscale image with a kernel. The offset
-     * centres the kernel on the pixel being examined, and pixels outside the
-     * image are skipped, which leaves the one pixel border untouched. The
-     * kernels above are written row by row, so the row picks the vertical
-     * neighbour and the column the horizontal one, which is the transposed
-     * reading week 15 warns about.
+     * centres the kernel on the pixel examined. The kernels are written row by
+     * row, so the row picks the vertical neighbour and the column the
+     * horizontal one, the transposed reading week 15 warns about.
      * @param {p5.Image} source - Greyscale image with its pixels loaded.
      * @param {Array<Array<number>>} kernel - Square kernel of odd size.
      * @return {Float32Array} One signed response per pixel.
@@ -59,10 +55,9 @@ class ConvolutionFilter {
         const offset = Math.floor(size / 2);
         const response = new Float32Array(w * h);
 
-        // Pixels within one kernel radius of the border have no full
-        // neighbourhood, so they are left at zero rather than convolved with a
-        // partial kernel, which would otherwise draw a bright false edge right
-        // around the frame (week 15).
+        // Border pixels have no full neighbourhood, so they stay at zero. A
+        // partial kernel there would draw a false edge around the frame,
+        // because its weights no longer sum to zero (week 15).
         for (let y = offset; y < h - offset; y++) {
             for (let x = offset; x < w - offset; x++) {
                 let total = 0;

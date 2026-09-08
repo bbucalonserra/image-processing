@@ -1,15 +1,14 @@
 /**
- * Class drawing the large direction arrow. The outline is written once in the
- * local space of an arrow pointing right, then every point is rotated by the
- * reported angle with sine and cosine (week 8) and offset to the panel centre,
- * so the overlay needs no transformation stack.
+ * Draws the direction arrow. The outline is written once for an arrow pointing
+ * right, then each point is rotated by the reported angle with sine and cosine
+ * (week 8) and offset to the panel centre, so no transformation stack is used.
  */
 class ArrowOverlay {
     /**
-     * @param {number} length - Overall length of the arrow in pixels.
-     * @param {number} shaftHalf - Half thickness of the shaft in pixels.
-     * @param {number} headLength - Length of the arrow head in pixels.
-     * @param {number} headHalf - Half width of the arrow head in pixels.
+     * @param {number} length - Arrow length in pixels.
+     * @param {number} shaftHalf - Half thickness of the shaft.
+     * @param {number} headLength - Length of the head.
+     * @param {number} headHalf - Half width of the head.
      */
     constructor(length, shaftHalf, headLength, headHalf) {
         this.length = length;
@@ -19,9 +18,9 @@ class ArrowOverlay {
     }
 
     /**
-     * The outline of an arrow pointing along the positive x axis, listed
-     * clockwise from the back of the shaft.
-     * @return {Array<Array<number>>} Local [x, y] points of the outline.
+     * Outline of an arrow pointing along the positive x axis, clockwise from
+     * the back of the shaft.
+     * @return {Array<Array<number>>} Local [x, y] points.
      */
     outline() {
         const half = this.length / 2;
@@ -38,11 +37,11 @@ class ArrowOverlay {
     }
 
     /**
-     * Draws the arrow pointing in the given direction.
-     * @param {number} centreX - Centre of the arrow on the x axis.
-     * @param {number} centreY - Centre of the arrow on the y axis.
+     * Draws the arrow in the given direction.
+     * @param {number} centreX - Arrow centre on the x axis.
+     * @param {number} centreY - Arrow centre on the y axis.
      * @param {number} angleDegrees - Direction the arrow points at.
-     * @param {p5.Color} fillColour - Colour the arrow is filled with.
+     * @param {p5.Color} fillColour - Fill colour.
      * @return {void}
      */
     draw(centreX, centreY, angleDegrees, fillColour) {
@@ -65,10 +64,10 @@ class ArrowOverlay {
     }
 
     /**
-     * Draws the marker used when no motion cleared the dead zone.
-     * @param {number} centreX - Centre of the marker on the x axis.
-     * @param {number} centreY - Centre of the marker on the y axis.
-     * @param {p5.Color} strokeColour - Colour of the marker.
+     * Draws the marker used when no axis cleared the dead zone.
+     * @param {number} centreX - Marker centre on the x axis.
+     * @param {number} centreY - Marker centre on the y axis.
+     * @param {p5.Color} strokeColour - Marker colour.
      * @return {void}
      */
     drawStill(centreX, centreY, strokeColour) {

@@ -1,20 +1,18 @@
-/** Class removing the studio backdrop from a provided image. */
+/** Removes the backdrop from a provided image. */
 class BackgroundRemover {
     /**
-     * @param {MaskRefiner} refiner - Post processing applied to the raw mask.
+     * @param {MaskRefiner} refiner - Applied to the raw mask.
      */
     constructor(refiner) {
         this.refiner = refiner;
     }
 
     /**
-     * Produces a foreground only copy of an image using its stored threshold
-     * row, as the brief asks: read the colour space from the row, threshold in
-     * that space, then write the result into a fresh image with an alpha
-     * channel.
+     * Cuts the background out using the stored row: read the colour space,
+     * threshold in it, refine the mask, write the result as an alpha channel.
      * @param {p5.Image} source - The provided image.
      * @param {Array<number>} setting - The [colourSpace, c1, c2, c3] row.
-     * @return {p5.Image} A copy whose background pixels are transparent.
+     * @return {p5.Image} Copy whose background pixels are transparent.
      */
     removeBackground(source, setting) {
         const w = source.width;
@@ -43,9 +41,8 @@ class BackgroundRemover {
     }
 
     /**
-     * Marks a pixel as background when all three channels sit above their own
-     * minimum, which suits the clean white cut outs.
-     * @param {p5.Image} source - Image with its pixels already loaded.
+     * Background when all three channels are above their own minimum.
+     * @param {p5.Image} source - Image with its pixels loaded.
      * @param {Array<number>} setting - The [0, minRed, minGreen, minBlue] row.
      * @return {Uint8Array} 1 where the pixel is background.
      */
@@ -68,11 +65,10 @@ class BackgroundRemover {
     }
 
     /**
-     * Marks a pixel as background when its hue is close to the backdrop hue,
-     * its saturation is low and its brightness is high. Splitting colour from
-     * lightness this way is what keeps a white shirt while still dropping a
-     * white wall, which an RGB limit cannot do (colour spaces, week 13).
-     * @param {p5.Image} source - Image with its pixels already loaded.
+     * Background when the hue is near the backdrop hue, the saturation is low
+     * and the brightness is high. Separating colour from lightness is what
+     * keeps a white shirt while dropping a white wall (week 13).
+     * @param {p5.Image} source - Image with its pixels loaded.
      * @param {Array<number>} setting - The [1, hueRange, maxSat, minBri] row.
      * @return {Uint8Array} 1 where the pixel is background.
      */
@@ -91,11 +87,11 @@ class BackgroundRemover {
                     source.pixels[index + 2]
                 );
 
-                // Hue is unstable on near neutral pixels, so it only votes
-                // once the pixel carries enough colour to be trusted.
+                // Hue only votes once the pixel carries enough colour.
+                const hueGap = PixelUtilities.hueDistance(hsb[0], backdropHue);
                 const hueAgrees =
                     hsb[1] <= ThresholdSettings.NEUTRAL_SATURATION ||
-                    PixelUtilities.hueDistance(hsb[0], backdropHue) <= setting[1];
+                    hueGap <= setting[1];
 
                 const isBackground =
                     hueAgrees && hsb[1] <= setting[2] && hsb[2] >= setting[3];
@@ -106,10 +102,10 @@ class BackgroundRemover {
     }
 
     /**
-     * Estimates the hue of the backdrop from the two top corners, which are
-     * the only areas guaranteed to be free of the subject in all eight images.
-     * @param {p5.Image} source - Image with its pixels already loaded.
-     * @return {number} The average backdrop hue in degrees.
+     * Backdrop hue taken from the two top corners, the only regions free of
+     * the subject in all eight images.
+     * @param {p5.Image} source - Image with its pixels loaded.
+     * @return {number} Mean backdrop hue in degrees.
      */
     sampleBackdropHue(source) {
         const w = source.width;
@@ -117,8 +113,7 @@ class BackgroundRemover {
         const blockW = Math.max(1, Math.floor(w * 0.06));
         const blockH = Math.max(1, Math.floor(h * 0.06));
 
-        // Hues are averaged as unit vectors so that values either side of
-        // 0 degrees do not cancel each other out.
+        // Averaged as unit vectors so hues either side of 0 do not cancel.
         let sumX = 0;
         let sumY = 0;
         let counted = 0;

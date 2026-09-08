@@ -1,21 +1,24 @@
 /**
- * Class running Task 2. It steps through the pipeline the brief lists, keyed
- * by p for the panorama screen, i to load a pair, g for greyscale, e for the
- * edge filter, t for the threshold, n for the centroid and d for the arrow
- * overlay, and it draws both frames beside the direction panel.
+ * Task 2. Steps through the pipeline the brief lists, keyed by p for the
+ * panorama screen, i to load a pair, g for greyscale, e for the edge filter,
+ * t for the threshold, n for the centroid and d for the arrow, and draws both
+ * frames beside the direction panel.
  */
 class PanoramaScreen extends Screen {
     /**
-     * The eight pairs on offer. The first four are the provided ones, the last
-     * four were built from the provided images to cover the directions the
-     * provided set leaves out.
-     * @return {Array<object>} File paths and expected direction of each pair.
+     * The eight pairs. The first four are provided, the last four were built
+     * from the provided images to cover the missing directions.
+     * @return {Array<object>} File stem and expected direction of each pair.
      */
     static get PAIRS() {
         return [
             { label: "Pair 1 (provided)", file: "pair1", expected: "RIGHT" },
             { label: "Pair 2 (provided)", file: "pair2", expected: "LEFT" },
-            { label: "Pair 3 (provided)", file: "pair3", expected: "DOWN-RIGHT" },
+            {
+                label: "Pair 3 (provided)",
+                file: "pair3",
+                expected: "DOWN-RIGHT"
+            },
             { label: "Pair 4 (provided)", file: "pair4", expected: "UP-LEFT" },
             { label: "Pair 5 (built)", file: "pair5", expected: "UP" },
             { label: "Pair 6 (built)", file: "pair6", expected: "DOWN" },
@@ -26,8 +29,8 @@ class PanoramaScreen extends Screen {
 
     /**
      * @param {Array<Array<p5.Image>>} pairImages - One [frameA, frameB] entry
-     *     per pair, in the same order as PAIRS.
-     * @param {number} panelTop - Height at which the frame panels begin.
+     *     per pair, in the order of PAIRS.
+     * @param {number} panelTop - Top of the frame panels.
      */
     constructor(pairImages, panelTop) {
         super("TASK 2 - PANORAMA MOTION GUIDE", [
@@ -61,7 +64,7 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Shows the slider again when the screen is reopened past the threshold.
+     * Shows the slider again when the screen is reopened.
      * @return {void}
      */
     enter() {
@@ -70,7 +73,7 @@ class PanoramaScreen extends Screen {
 
     /**
      * Hides the slider while Task 1 is on screen, since it is a DOM element
-     * and would otherwise float above the other task.
+     * and would float above the canvas.
      * @return {void}
      */
     exit() {
@@ -78,7 +81,7 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Shows the slider only once the threshold stage has been reached.
+     * Slider is visible only from the threshold stage onwards.
      * @return {void}
      */
     updateSliderVisibility() {
@@ -91,8 +94,8 @@ class PanoramaScreen extends Screen {
 
     /**
      * Handles the pipeline keys and the arrow keys that change pair.
-     * @param {string} pressedKey - The key character, already lower cased.
-     * @param {number} pressedCode - The p5 key code.
+     * @param {string} pressedKey - Key character, lower cased.
+     * @param {number} pressedCode - p5 key code.
      * @return {void}
      */
     handleKey(pressedKey, pressedCode) {
@@ -128,7 +131,7 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Wraps every preloaded pair in a FramePair, ready for processing.
+     * Wraps every preloaded pair in a FramePair.
      * @return {void}
      */
     loadPairs() {
@@ -142,7 +145,7 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * @return {FramePair|null} The pair currently on screen.
+     * @return {FramePair|null} Pair on screen.
      */
     currentPair() {
         if (this.pairs.length === 0) return null;
@@ -150,8 +153,8 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Brings the current pair up to the stage that has been reached, which
-     * also picks up a new slider value or a change of pair.
+     * Brings the current pair up to the stage reached, which also picks up a
+     * new slider value or a change of pair.
      * @return {void}
      */
     update() {
@@ -203,20 +206,24 @@ class PanoramaScreen extends Screen {
 
     /**
      * Draws one original frame in the top row.
-     * @param {FramePair} pair - The pair on screen.
+     * @param {FramePair} pair - Pair on screen.
      * @param {number} slot - 0 for Frame A, 1 for Frame B.
      * @return {void}
      */
     drawFramePanel(pair, slot) {
         const x = this.columnX[slot];
-        this.drawPanelFrame(x, this.panelTop, slot === 0 ? "FRAME A" : "FRAME B");
-        image(pair.frame(slot), x, this.panelTop, this.panelWidth, this.panelHeight);
+        const label = slot === 0 ? "FRAME A" : "FRAME B";
+        this.drawPanelFrame(x, this.panelTop, label);
+        image(
+            pair.frame(slot),
+            x, this.panelTop, this.panelWidth, this.panelHeight
+        );
     }
 
     /**
-     * Draws the most advanced processed image available for one frame, plus
-     * the centroid marker once it has been computed.
-     * @param {FramePair} pair - The pair on screen.
+     * Draws the latest processed image for one frame, plus the centroid
+     * marker once it exists.
+     * @param {FramePair} pair - Pair on screen.
      * @param {number} slot - 0 for Frame A, 1 for Frame B.
      * @return {void}
      */
@@ -249,10 +256,10 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Picks the image to show in the processed row for the current stage.
-     * @param {FramePair} pair - The pair on screen.
+     * Picks the image the processed row shows at the current stage.
+     * @param {FramePair} pair - Pair on screen.
      * @param {number} slot - 0 for Frame A, 1 for Frame B.
-     * @return {p5.Image|null} The image to draw, or null when none exists yet.
+     * @return {p5.Image|null} Image to draw, or null when none exists.
      */
     processedImage(pair, slot) {
         if (this.stageIndex >= this.stages.indexOf("threshold")) {
@@ -268,23 +275,25 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * @return {string} Label describing what the processed row is showing.
+     * @return {string} Label for the processed row.
      */
     processedLabel() {
         if (this.stageIndex >= this.stages.indexOf("threshold")) {
             return "THRESHOLDED EDGES";
         }
-        if (this.stageIndex >= this.stages.indexOf("edges")) return "EDGE OUTPUT";
+        if (this.stageIndex >= this.stages.indexOf("edges")) {
+            return "EDGE OUTPUT";
+        }
         if (this.stageIndex >= this.stages.indexOf("grey")) return "GREYSCALE";
         return "PROCESSED";
     }
 
     /**
      * Draws the centroid over the processed frame, converting from image
-     * coordinates to the coordinates the panel is drawn at.
+     * coordinates to panel coordinates.
      * @param {number} x - Left edge of the panel.
      * @param {number} y - Top edge of the panel.
-     * @param {p5.Image} shown - The image drawn in the panel.
+     * @param {p5.Image} shown - Image drawn in the panel.
      * @param {object} centroid - {x, y, count} of the frame.
      * @return {void}
      */
@@ -303,8 +312,8 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Draws the direction panel holding the large arrow overlay.
-     * @param {FramePair|null} pair - The pair on screen, if one is loaded.
+     * Draws the direction panel with the arrow overlay.
+     * @param {FramePair|null} pair - Pair on screen, if one is loaded.
      * @return {void}
      */
     drawDirectionPanel(pair) {
@@ -352,15 +361,15 @@ class PanoramaScreen extends Screen {
         textAlign(CENTER, CENTER);
         textSize(34);
         textStyle(BOLD);
-        // Parked at the foot of the panel so a vertical arrow cannot sit on it.
+        // At the foot of the panel, clear of a vertical arrow.
         text(pair.motion.label, centreX, y + h - 40);
         pop();
     }
 
     /**
-     * Draws the pair name, the two centroids, the shift and the check against
-     * the direction the pair was built to show.
-     * @param {FramePair} pair - The pair on screen.
+     * Draws the pair name, the centroids, the shift and the check against the
+     * direction the pair was built to show.
+     * @param {FramePair} pair - Pair on screen.
      * @return {void}
      */
     drawReadout(pair) {
@@ -409,7 +418,7 @@ class PanoramaScreen extends Screen {
      * Draws an empty panel with its label.
      * @param {number} x - Left edge of the panel.
      * @param {number} y - Top edge of the panel.
-     * @param {string} label - Caption drawn above the panel.
+     * @param {string} label - Caption above the panel.
      * @return {void}
      */
     drawPanelFrame(x, y, label) {
@@ -426,7 +435,7 @@ class PanoramaScreen extends Screen {
 
     /**
      * Draws a prompt across the frame area.
-     * @param {string} message - The prompt to show.
+     * @param {string} message - Prompt to show.
      * @return {void}
      */
     drawNotice(message) {
@@ -440,7 +449,7 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * @return {string} One line of guidance for the header.
+     * @return {string} Keys available now, for the header.
      */
     hint() {
         if (this.currentStage() === "idle") return "[P] panorama screen";

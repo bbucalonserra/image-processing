@@ -1,36 +1,34 @@
 /**
- * Class refining a raw threshold mask into a clean alpha channel.
+ * Turns a raw threshold mask into an alpha channel. This is the extension.
  *
- * This is the creative extension. A threshold on its own answers the question
- * "does this pixel look like the backdrop?", which is why a white shirt
- * disappears and why lone backdrop pixels survive inside the subject. The
- * refiner adds the missing question, "is this pixel connected to the
- * backdrop?", by running a flood fill from the border, in the spirit of the
- * blob grouping shown in the computer vision material of week 17. Small
- * foreground islands are then dropped, the background is grown by one pixel to
- * bite off the compression halo, and the binary mask is blurred with the 3x3
- * mean kernel of week 15 so the cut out edge is soft rather than jagged.
+ * A threshold answers "does this pixel have the colour of the backdrop?". That
+ * misses two cases: backdrop colour enclosed by the subject, such as a white
+ * shirt, and subject colour left isolated in the backdrop. The refiner adds
+ * "is this pixel connected to the backdrop?" with a flood fill from the
+ * border, the blob grouping of week 17. It then drops small foreground blobs,
+ * grows the background by one pixel to remove the compression halo, and blurs
+ * the mask with the 3x3 mean kernel of week 15 to soften the edge.
  */
 class MaskRefiner {
     /**
-     * @param {number} minIslandArea - Foreground blobs smaller than this many
-     *     pixels are treated as noise and removed.
-     * @param {number} growPasses - How many pixels the background grows by.
-     * @param {number} featherPasses - How many blur passes soften the edge.
+     * @param {number} minIslandArea - Foreground blobs below this pixel count
+     *     are removed.
+     * @param {number} growPasses - Pixels the background grows by.
+     * @param {number} featherPasses - Blur passes applied to the edge.
      */
     constructor(minIslandArea, growPasses, featherPasses) {
         this.minIslandArea = minIslandArea;
         this.growPasses = growPasses;
         this.featherPasses = featherPasses;
 
-        /** @type {Array<number>} Horizontal neighbour offsets, four connected. */
+        /** @type {Array<number>} Horizontal offsets, four connected. */
         this.stepX = [1, -1, 0, 0];
-        /** @type {Array<number>} Matching vertical neighbour offsets. */
+        /** @type {Array<number>} Matching vertical offsets. */
         this.stepY = [0, 0, 1, -1];
     }
 
     /**
-     * Runs the whole refinement chain on a raw threshold mask.
+     * Runs the four refinement steps.
      * @param {Uint8Array} mask - 1 where the threshold called background.
      * @param {number} w - Mask width in pixels.
      * @param {number} h - Mask height in pixels.
@@ -44,13 +42,12 @@ class MaskRefiner {
     }
 
     /**
-     * Keeps only the background pixels that can be reached from the image
-     * border, so backdrop coloured pixels enclosed by the subject, such as a
-     * white shirt or a bright collar, are handed back to the subject.
+     * Keeps only background reachable from the image border. Backdrop colour
+     * enclosed by the subject is returned to the subject.
      * @param {Uint8Array} mask - Raw threshold mask.
      * @param {number} w - Mask width in pixels.
      * @param {number} h - Mask height in pixels.
-     * @return {Uint8Array} Mask holding the border connected background only.
+     * @return {Uint8Array} Border connected background only.
      */
     keepBorderConnected(mask, w, h) {
         const reached = new Uint8Array(w * h);
@@ -85,8 +82,7 @@ class MaskRefiner {
     }
 
     /**
-     * Adds one border pixel to the flood fill stack when it is background and
-     * has not been visited yet.
+     * Adds a border pixel to the fill stack when it is unvisited background.
      * @param {Uint8Array} mask - Raw threshold mask.
      * @param {Uint8Array} reached - Visited flags, edited in place.
      * @param {Int32Array} stack - The fill stack, edited in place.
@@ -106,8 +102,8 @@ class MaskRefiner {
     }
 
     /**
-     * Removes foreground blobs smaller than minIslandArea, which clears the
-     * speckles a threshold always leaves in flat areas of the backdrop.
+     * Removes foreground blobs below minIslandArea, which clears the speckles
+     * a threshold leaves in flat areas of the backdrop.
      * @param {Uint8Array} mask - Background mask to clean.
      * @param {number} w - Mask width in pixels.
      * @param {number} h - Mask height in pixels.
@@ -152,8 +148,8 @@ class MaskRefiner {
     }
 
     /**
-     * Grows the background by one pixel per pass, which removes the pale rim
-     * of half backdrop, half subject pixels left by JPEG compression.
+     * Grows the background by one pixel per pass, removing the rim of mixed
+     * backdrop and subject pixels left by JPEG compression.
      * @param {Uint8Array} mask - Background mask to grow.
      * @param {number} w - Mask width in pixels.
      * @param {number} h - Mask height in pixels.
@@ -184,7 +180,7 @@ class MaskRefiner {
     }
 
     /**
-     * Turns the binary mask into an alpha channel.
+     * Converts the binary mask to an alpha channel.
      * @param {Uint8Array} mask - Background mask.
      * @return {Uint8Array} Alpha values, 0 or 255.
      */
@@ -198,7 +194,7 @@ class MaskRefiner {
 
     /**
      * Blurs the alpha channel with the 3x3 mean kernel of week 15, so the cut
-     * out fades into the carousel background instead of stair stepping.
+     * out edge fades instead of stair stepping.
      * @param {Uint8Array} alpha - Alpha channel to soften.
      * @param {number} w - Image width in pixels.
      * @param {number} h - Image height in pixels.

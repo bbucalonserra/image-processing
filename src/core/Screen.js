@@ -1,29 +1,28 @@
-/** Base class for a task screen, defining the interface the app expects. */
+/** Base class for a task screen. */
 class Screen {
     /**
      * @param {string} title - Name shown in the header.
-     * @param {Array<string>} stages - Ordered stage names, first one is the
-     *     idle stage the screen returns to when it is reset.
+     * @param {Array<string>} stages - Stage names in order. Index 0 is idle.
      */
     constructor(title, stages) {
         this.title = title;
-        /** @type {Array<string>} The pipeline stages this screen steps through. */
+        /** @type {Array<string>} Stages this screen steps through. */
         this.stages = stages;
-        /** @type {number} Index of the stage currently reached. */
+        /** @type {number} Index of the stage reached. */
         this.stageIndex = 0;
     }
 
     /**
-     * @return {string} Name of the stage currently reached.
+     * @return {string} Name of the stage reached.
      */
     currentStage() {
         return this.stages[this.stageIndex];
     }
 
     /**
-     * Moves to a stage, refusing jumps that would skip a required step so the
-     * keys have to be pressed in the order the brief asks for.
-     * @param {string} stage - Name of the requested stage.
+     * Moves to a stage. A jump of more than one step forward is refused, which
+     * enforces the key order the brief sets out. Going back is allowed.
+     * @param {string} stage - Requested stage name.
      * @return {boolean} Whether the stage was entered.
      */
     requestStage(stage) {
@@ -54,15 +53,15 @@ class Screen {
     exit() {}
 
     /**
-     * Handles a key press addressed to this screen.
-     * @param {string} pressedKey - The key character, already lower cased.
-     * @param {number} pressedCode - The p5 key code.
+     * Handles a key press sent to this screen.
+     * @param {string} pressedKey - Key character, lower cased.
+     * @param {number} pressedCode - p5 key code.
      * @return {void}
      */
     handleKey(pressedKey, pressedCode) {}
 
     /**
-     * Advances any per frame state.
+     * Advances per frame state.
      * @return {void}
      */
     update() {}
@@ -74,7 +73,7 @@ class Screen {
     draw() {}
 
     /**
-     * @return {string} One line of guidance for the header.
+     * @return {string} Keys available now, for the header.
      */
     hint() {
         return "";
