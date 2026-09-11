@@ -19,7 +19,6 @@ npm-debug.log*
 # Build output and submission archives
 dist/
 build/
-*.zip
 
 # Local scratch work and screenshots taken while testing
 scratch/
