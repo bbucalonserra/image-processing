@@ -19,6 +19,11 @@ class CarouselScreen extends Screen {
         this.panelTop = panelTop;
         this.panelHeight = panelHeight;
 
+        /** @type {number} Width every image is reduced to before processing. */
+        this.workingWidth = 400;
+        /** @type {number} Matching height limit, aspect ratio kept. */
+        this.workingHeight = 480;
+
         /** @type {BackgroundRemover} Threshold based cut out. */
         this.remover = new BackgroundRemover(new MaskRefiner(60, 1, 1));
         /** @type {Carousel} The scrolling row of processed entries. */
@@ -79,7 +84,7 @@ class CarouselScreen extends Screen {
         if (this.comparisons[index]) return this.comparisons[index];
 
         const scaled = PixelUtilities.scaledCopy(
-            this.sourceImages[index], 400, 480
+            this.sourceImages[index], this.workingWidth, this.workingHeight
         );
         const chosenRow = ThresholdSettings.settingFor(index);
         const otherRow = ThresholdSettings.alternativeFor(index);
@@ -109,7 +114,7 @@ class CarouselScreen extends Screen {
 
         for (let i = 0; i < this.sourceImages.length; i++) {
             const scaled = PixelUtilities.scaledCopy(
-                this.sourceImages[i], 400, 480
+                this.sourceImages[i], this.workingWidth, this.workingHeight
             );
             const foreground = this.remover.removeBackground(
                 scaled, ThresholdSettings.settingFor(i)
@@ -230,7 +235,9 @@ class CarouselScreen extends Screen {
      * @return {void}
      */
     drawSubject(item, progress, alphaValue, scaleFactor) {
-        const drawH = (this.panelHeight - 90) * scaleFactor;
+        // The margin is set so that the subject stays inside the panel at the
+        // large end of the zoom, rather than reaching over its top edge.
+        const drawH = (this.panelHeight - 110) * scaleFactor;
         const drawW = drawH * (item.foreground.width / item.foreground.height);
         const centreX = lerp(drawW * 0.6, width - drawW * 0.6, progress);
         const baseline = this.panelTop + this.panelHeight - 56;

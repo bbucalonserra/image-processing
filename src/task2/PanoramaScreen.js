@@ -28,6 +28,25 @@ class PanoramaScreen extends Screen {
     }
 
     /**
+     * The steps the user drives, in the order they have to be pressed. Each
+     * entry is [key, short name, stage it reaches], and the stage names match
+     * the list passed to the base class, so the strip on screen and the rule
+     * that blocks a skipped key cannot drift apart.
+     * @return {Array<Array<string>>} One entry per step.
+     */
+    static get PIPELINE() {
+        return [
+            ["I", "pairs", "pairs"],
+            ["G", "grey", "grey"],
+            ["E", "edges", "edges"],
+            ["T", "thresh", "threshold"],
+            ["N", "centroid", "centroid"],
+            ["D", "arrow", "arrow"],
+            ["F", "flow", "flow"]
+        ];
+    }
+
+    /**
      * @param {Array<Array<p5.Image>>} pairImages - One [frameA, frameB] entry
      *     per pair, in the order of PAIRS.
      * @param {number} panelTop - Top of the frame panels.
@@ -46,6 +65,15 @@ class PanoramaScreen extends Screen {
         this.columnX = [40, 400];
         this.rowGap = 282;
 
+        /** @type {number} Top of the readout, below the processed row. */
+        this.readoutTop = panelTop + this.rowGap + this.panelHeight + 14;
+        /** @type {number} Column the accuracy check is written in. */
+        this.checkX = 430;
+        /** @type {number} Left edge of the direction panel. */
+        this.directionX = 790;
+        /** @type {number} Margin kept at the right of the canvas. */
+        this.rightMargin = 40;
+
         /** @type {Array<FramePair>} One entry per pair, filled on the i key. */
         this.pairs = [];
         /** @type {number} Index of the pair being examined. */
@@ -60,7 +88,8 @@ class PanoramaScreen extends Screen {
 
         /** @type {p5.Element} Interactive control over the edge threshold. */
         this.thresholdSlider = createSlider(0, 255, 100);
-        this.thresholdSlider.position(40, this.panelTop + this.rowGap + 268);
+        // Sits in the gap between the two readout lines, clear of both.
+        this.thresholdSlider.position(this.columnX[0], this.readoutTop + 22);
         this.thresholdSlider.style("width", "300px");
         this.thresholdSlider.hide();
     }
@@ -195,15 +224,19 @@ class PanoramaScreen extends Screen {
      */
     draw() {
         if (this.currentStage() === "idle") {
-            this.drawNotice("Press P to open the panorama screen");
+            this.drawNotice("Press P to open the panorama screen", height / 2);
             return;
         }
 
+        this.drawPipeline();
         const pair = this.currentPair();
         if (!pair) {
             this.drawPanelFrame(this.columnX[0], this.panelTop, "FRAME A");
             this.drawPanelFrame(this.columnX[1], this.panelTop, "FRAME B");
-            this.drawNotice("Press I to load a pair of images");
+            this.drawNotice(
+                "Press I to load a pair of images",
+                this.panelTop + this.panelHeight / 2
+            );
             this.drawDirectionPanel(null);
             return;
         }
@@ -214,6 +247,51 @@ class PanoramaScreen extends Screen {
         }
         this.drawDirectionPanel(pair);
         this.drawReadout(pair);
+    }
+
+    /**
+     * Draws the ordered list of steps above the panels, outside every box, so
+     * the keys still to press stay on screen after a step has been taken. A
+     * step already reached is green, the one that may be pressed now is boxed,
+     * and the rest are dim. The step that may be pressed now is worked out
+     * from the same stage index that blocks a skipped key, so a dim step is
+     * one the app will refuse.
+     * @return {void}
+     */
+    drawPipeline() {
+        push();
+        noStroke();
+        textSize(12);
+        textAlign(LEFT, TOP);
+
+        const y = 80;
+        let x = this.columnX[0];
+
+        fill(130);
+        const intro = "ORDER, each step unlocks the next";
+        text(intro, x, y);
+        x += textWidth(intro) + 18;
+
+        for (const step of PanoramaScreen.PIPELINE) {
+            const label = "[" + step[0] + "] " + step[1];
+            const labelWidth = textWidth(label);
+            const stage = this.stages.indexOf(step[2]);
+
+            if (stage <= this.stageIndex) {
+                fill(120, 220, 140);
+                text(label, x, y);
+            } else if (stage === this.stageIndex + 1) {
+                fill(48, 104, 176);
+                rect(x - 5, y - 3, labelWidth + 10, 19, 4);
+                fill(255);
+                text(label, x, y);
+            } else {
+                fill(105);
+                text(label, x, y);
+            }
+            x += labelWidth + 16;
+        }
+        pop();
     }
 
     /**
@@ -287,11 +365,11 @@ class PanoramaScreen extends Screen {
         if (!shown) {
             push();
             noStroke();
-            fill(150);
+            fill(130);
             textAlign(CENTER, CENTER);
             textSize(14);
             text(
-                "Press G, E, T, N then D",
+                "nothing computed yet",
                 x + this.panelWidth / 2,
                 y + this.panelHeight / 2
             );
@@ -367,9 +445,9 @@ class PanoramaScreen extends Screen {
      * @return {void}
      */
     drawDirectionPanel(pair) {
-        const x = 790;
+        const x = this.directionX;
         const y = this.panelTop;
-        const w = width - x - 40;
+        const w = width - x - this.rightMargin;
         const h = this.panelHeight + this.rowGap - 44;
 
         push();
@@ -438,7 +516,7 @@ class PanoramaScreen extends Screen {
      * @return {void}
      */
     drawReadout(pair) {
-        const y = this.panelTop + this.rowGap + this.panelHeight + 14;
+        const y = this.readoutTop;
 
         push();
         noStroke();
@@ -448,7 +526,7 @@ class PanoramaScreen extends Screen {
         text(
             pair.label + "   [<] [>] change pair   edge threshold " +
             this.thresholdSlider.value(),
-            40, y
+            this.columnX[0], y
         );
 
         let readout = "Centroids not computed yet, press N";
@@ -464,8 +542,9 @@ class PanoramaScreen extends Screen {
                 "   dy " + pair.motion.dy.toFixed(1) +
                 "   shift " + pair.motion.distance.toFixed(1) + " px";
         }
+        // Below the slider that sits between the two lines.
         fill(170);
-        text(readout, 40, y + 46);
+        text(readout, this.columnX[0], y + 52);
 
         if (pair.motion) {
             const correct = pair.motion.label === pair.expected;
@@ -473,7 +552,7 @@ class PanoramaScreen extends Screen {
             text(
                 "expected " + pair.expected + "   centroid " +
                 pair.motion.label + (correct ? "   match" : "   mismatch"),
-                430, y
+                this.checkX, y
             );
         }
         if (pair.flowMotion) {
@@ -484,7 +563,7 @@ class PanoramaScreen extends Screen {
                 "   dx " + pair.flowMotion.dx.toFixed(1) +
                 "   dy " + pair.flowMotion.dy.toFixed(1) +
                 (flowCorrect ? "   match" : "   mismatch"),
-                430, y + 23
+                this.checkX, y + 23
             );
         }
         pop();
@@ -512,15 +591,16 @@ class PanoramaScreen extends Screen {
     /**
      * Draws a prompt across the frame area.
      * @param {string} message - Prompt to show.
+     * @param {number} y - Height the prompt is centred on.
      * @return {void}
      */
-    drawNotice(message) {
+    drawNotice(message, y) {
         push();
         noStroke();
         fill(210);
         textAlign(CENTER, CENTER);
         textSize(20);
-        text(message, width / 2, this.panelTop + this.panelHeight / 2 + 140);
+        text(message, width / 2, y);
         pop();
     }
 

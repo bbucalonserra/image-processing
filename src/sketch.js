@@ -50,6 +50,28 @@
  *    centroid method cannot do without.
  */
 
+
+/**
+ * COMMENTARY (XXX words).
+ * 1. WALKTHROUGH
+ * As an entry point, the app runs both tasks. When clicking key 1, loads the
+ * task 1, the key 2 loads task 2. Key H shows or hides the list of keys
+ * in the screen. It's important to point out that the header always
+ * shows which task is active and which  keys are available at that 
+ * moment. For task 1, the sequence are the keys: "c", "l" and "s", where "c" opens
+ * the carroussel, "l", where the image processing actually occours,
+ * makes each of the eight images are reduced and the
+ * background is cropped going through the table thresholds[i] = [colourSpace, c1, c2, c3].
+ * When colourspace is 0, the three values are the lower from red, green and blue.
+ * When 1, c1 is the matrix tolerance, c2 maximum saturation and c3 the 
+ * minimum brightness. Each image has its own line since all eight has different
+ * backgrounds. 
+ * 
+ *  
+ *      
+ * 
+*/
+
 const CANVAS_W = 1280;
 const CANVAS_H = 720;
 

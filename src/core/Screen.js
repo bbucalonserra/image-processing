@@ -33,14 +33,6 @@ class Screen {
     }
 
     /**
-     * Returns the screen to its idle stage.
-     * @return {void}
-     */
-    reset() {
-        this.stageIndex = 0;
-    }
-
-    /**
      * Called when the screen becomes visible.
      * @return {void}
      */

@@ -10,11 +10,14 @@
  *            top corners, c2 the maximum saturation, c3 the minimum
  *            brightness.
  *
- * Both colour spaces were measured on all eight images. RGB is used where the
- * backdrop is a clean white cut out, since one limit per channel separates it.
- * HSB is used on image 1, whose wall is dim and tinted, and on images 2 and 7,
- * where the subject wears white: there the saturation limit keeps the garment
- * while the brightness limit still drops the wall, which RGB cannot do.
+ * Both colour spaces were measured on all eight images and the row kept here
+ * is the one that scored fewer mistakes. RGB holds images 4, 5 and 6, where
+ * the backdrop is a clean white cut out that one limit per channel separates,
+ * and image 2, whose right edge carries a vignette that HSB reads as too dark
+ * to be background. HSB holds images 1, 3 and 8, whose walls are dim, tinted
+ * or graded, and image 7, where the subject wears white: there the saturation
+ * limit keeps the garment while the brightness limit still drops the wall,
+ * which RGB cannot do.
  */
 class ThresholdSettings {
     /**

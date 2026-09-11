@@ -1,5 +1,6 @@
 /**
- * Turns a raw threshold mask into an alpha channel. This is the extension.
+ * Turns a raw threshold mask into an alpha channel. This is what meets the
+ * requirement that the carousel show no residual background pixels.
  *
  * A threshold answers "does this pixel have the colour of the backdrop?". That
  * misses two cases: backdrop colour enclosed by the subject, such as a white
