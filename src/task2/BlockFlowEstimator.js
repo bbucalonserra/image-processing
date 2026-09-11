@@ -1,15 +1,6 @@
 /**
- * Second motion estimator, used as the extension. It measures the shift with
- * block matching instead of a centroid: the frame is cut into blocks, each
- * block is searched for in the next frame, and the shift is the median of the
- * matches. Optical flow was shown in week 17 with a library, this is the same
- * idea written from scratch.
- *
- * Two decisions make it work on these frames. Matching runs on a downscaled
- * copy, so a search window that covers a shift of ninety pixels stays
- * affordable. Blocks whose pixels are nearly all the same value are skipped,
- * because a flat patch of backdrop matches everywhere and would contribute a
- * meaningless vector.
+ * The extension: a second motion estimator by block matching (week 17), on a
+ * downscaled copy, skipping flat blocks, taking the median of the matches.
  */
 class BlockFlowEstimator {
     /**
@@ -64,13 +55,14 @@ class BlockFlowEstimator {
     }
 
     /**
-     * Finds the offset that best matches one block of frame A inside frame B,
-     * using the sum of absolute differences.
+     * Finds the offset with the lowest sum of absolute differences for one
+     * block of frame A inside frame B.
      * @param {object} frameA - {data, w, h} of the first reduced frame.
      * @param {object} frameB - {data, w, h} of the second reduced frame.
      * @param {number} blockX - Left edge of the block in frame A.
      * @param {number} blockY - Top edge of the block in frame A.
-     * @return {object} {dx, dy} of the best match, in reduced pixels.
+     * @return {object} {dx, dy} of the match with the lowest score, in
+     *     reduced pixels.
      */
     matchBlock(frameA, frameB, blockX, blockY) {
         let bestScore = Infinity;
@@ -109,7 +101,7 @@ class BlockFlowEstimator {
     }
 
     /**
-     * Median of a list of numbers, used to reject the odd wrong match.
+     * Median of a list of numbers.
      * @param {Array<number>} values - The values to reduce.
      * @return {number} The median, or 0 for an empty list.
      */

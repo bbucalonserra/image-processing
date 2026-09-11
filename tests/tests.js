@@ -1,8 +1,6 @@
 /**
  * Checks the image processing functions against values worked out by hand.
- * The page needs no p5 canvas: every function under test works on plain
- * arrays, and the two that read an image are given a stub with the same
- * shape p5 provides.
+ * No p5 canvas is needed: image readers are given a stub of the p5 shape.
  */
 class TestRunner {
     constructor() {
@@ -189,7 +187,7 @@ function runTests() {
     const size = 9;
     const mask = new Uint8Array(size * size);
     for (let i = 0; i < mask.length; i++) mask[i] = 1;
-    // A solid subject in the middle, with one backdrop coloured pixel inside.
+    // A subject in the middle, with one backdrop coloured pixel inside.
     for (let y = 2; y <= 6; y++) {
         for (let x = 2; x <= 6; x++) mask[x + y * size] = 0;
     }
@@ -200,7 +198,7 @@ function runTests() {
     t.check("backdrop enclosed by the subject is returned to the subject",
         connected[4 + 4 * size] === 0, connected[4 + 4 * size]);
 
-    // Small foreground blobs are dropped.
+    // Foreground blobs under the limit are dropped.
     const speckled = new Uint8Array(size * size);
     for (let i = 0; i < speckled.length; i++) speckled[i] = 1;
     speckled[0] = 0;
@@ -220,7 +218,7 @@ function runTests() {
     );
     t.checkClose("median of an empty list", flow.median([]), 0, 0.001);
 
-    // The threshold table follows the shape the brief asks for.
+    // The threshold table shape.
     t.check("the table holds eight rows",
         ThresholdSettings.TABLE.length === 8, ThresholdSettings.TABLE.length);
     t.check("every row holds four values",

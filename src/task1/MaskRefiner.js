@@ -1,14 +1,6 @@
 /**
- * Turns a raw threshold mask into an alpha channel. This is what meets the
- * requirement that the carousel show no residual background pixels.
- *
- * A threshold answers "does this pixel have the colour of the backdrop?". That
- * misses two cases: backdrop colour enclosed by the subject, such as a white
- * shirt, and subject colour left isolated in the backdrop. The refiner adds
- * "is this pixel connected to the backdrop?" with a flood fill from the
- * border, the blob grouping of week 17. It then drops small foreground blobs,
- * grows the background by one pixel to remove the compression halo, and blurs
- * the mask with the 3x3 mean kernel of week 15 to soften the edge.
+ * Turns a threshold mask into an alpha channel with no residual background:
+ * flood fill from the border (week 17), island removal, growth, 3x3 blur.
  */
 class MaskRefiner {
     /**
@@ -41,9 +33,8 @@ class MaskRefiner {
 
     /**
      * Same chain as refine, and also reports how many pixels the threshold
-     * called background and how many of those were not joined to the border.
-     * The second figure is the part of the subject a threshold would have
-     * removed on its own, which is what the two colour spaces are compared on.
+     * called background and how many of those were not joined to the border,
+     * the figure the two colour spaces are compared on.
      * @param {Uint8Array} mask - 1 where the threshold called background.
      * @param {number} w - Mask width in pixels.
      * @param {number} h - Mask height in pixels.
@@ -69,9 +60,9 @@ class MaskRefiner {
     }
 
     /**
-     * Keeps only background reachable from the image border. Backdrop colour
-     * enclosed by the subject is returned to the subject.
-     * @param {Uint8Array} mask - Raw threshold mask.
+     * Keeps only background reachable from the image border (week 17).
+     * Backdrop colour enclosed by the subject is returned to the subject.
+     * @param {Uint8Array} mask - Threshold mask.
      * @param {number} w - Mask width in pixels.
      * @param {number} h - Mask height in pixels.
      * @return {Uint8Array} Border connected background only.
@@ -110,7 +101,7 @@ class MaskRefiner {
 
     /**
      * Adds a border pixel to the fill stack when it is unvisited background.
-     * @param {Uint8Array} mask - Raw threshold mask.
+     * @param {Uint8Array} mask - Threshold mask.
      * @param {Uint8Array} reached - Visited flags, edited in place.
      * @param {Int32Array} stack - The fill stack, edited in place.
      * @param {number} top - Current stack height.
@@ -129,9 +120,8 @@ class MaskRefiner {
     }
 
     /**
-     * Removes foreground blobs below minIslandArea, which clears the speckles
-     * a threshold leaves in flat areas of the backdrop.
-     * @param {Uint8Array} mask - Background mask to clean.
+     * Removes foreground blobs below minIslandArea.
+     * @param {Uint8Array} mask - Background mask.
      * @param {number} w - Mask width in pixels.
      * @param {number} h - Mask height in pixels.
      * @return {Uint8Array} The cleaned mask.
@@ -176,7 +166,7 @@ class MaskRefiner {
 
     /**
      * Grows the background by one pixel per pass, removing the rim of mixed
-     * backdrop and subject pixels left by JPEG compression.
+     * pixels left by JPEG compression.
      * @param {Uint8Array} mask - Background mask to grow.
      * @param {number} w - Mask width in pixels.
      * @param {number} h - Mask height in pixels.
@@ -220,8 +210,7 @@ class MaskRefiner {
     }
 
     /**
-     * Blurs the alpha channel with the 3x3 mean kernel of week 15, so the cut
-     * out edge fades instead of stair stepping.
+     * Blurs the alpha channel with the 3x3 mean kernel of week 15.
      * @param {Uint8Array} alpha - Alpha channel to soften.
      * @param {number} w - Image width in pixels.
      * @param {number} h - Image height in pixels.

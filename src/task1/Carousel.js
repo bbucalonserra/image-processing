@@ -74,8 +74,7 @@ class Carousel {
     }
 
     /**
-     * Draws the row inside a strip, repeating the entries so cards never run
-     * out on either side.
+     * Draws the row inside a strip, repeating the entries on both sides.
      * @param {number} x - Left edge of the strip.
      * @param {number} y - Top edge of the strip.
      * @param {number} stripW - Strip width in pixels.

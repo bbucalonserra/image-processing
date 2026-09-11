@@ -1,8 +1,7 @@
 /** Converts a colour image to greyscale. */
 class GreyscaleFilter {
     /**
-     * Greyscale copy using the luma weights rather than a plain average, so
-     * the brightness of the original is preserved (week 15).
+     * Greyscale copy using the luma weights (week 15).
      * @param {p5.Image} source - Colour frame.
      * @return {p5.Image} Greyscale copy.
      */

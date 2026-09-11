@@ -1,7 +1,6 @@
 /**
  * One pair of frames and everything derived from it. Each stage is computed
- * once and cached, so pressing a key again or changing pair only redoes the
- * work that is missing.
+ * once and cached.
  */
 class FramePair {
     /**
@@ -27,7 +26,7 @@ class FramePair {
         this.centroids = [null, null];
         /** @type {object|null} Motion reported by the centroid method. */
         this.motion = null;
-        /** @type {object|null} Raw output of the block matching estimator. */
+        /** @type {object|null} Output of the block matching estimator. */
         this.flow = null;
         /** @type {object|null} Motion reported by the block matching method. */
         this.flowMotion = null;
@@ -108,8 +107,7 @@ class FramePair {
     }
 
     /**
-     * Runs the block matching estimator on the greyscale frames. It does not
-     * depend on the threshold, so the result is computed once and kept.
+     * Runs the block matching estimator on the greyscale frames, once.
      * @param {BlockFlowEstimator} flowEstimator - Block matching estimator.
      * @param {MotionEstimator} estimator - Classifier for the shift it finds.
      * @return {void}

@@ -1,13 +1,11 @@
 /**
- * Task 2. Steps through the pipeline the brief lists, keyed by p for the
- * panorama screen, i to load a pair, g for greyscale, e for the edge filter,
- * t for the threshold, n for the centroid and d for the arrow, and draws both
- * frames beside the direction panel.
+ * Task 2. Keys p, i, g, e, t, n, d and f step through the pipeline. Draws
+ * both frames, the processed row and the direction panel.
  */
 class PanoramaScreen extends Screen {
     /**
      * The eight pairs. The first four are provided, the last four were built
-     * from the provided images to cover the missing directions.
+     * to cover the missing directions.
      * @return {Array<object>} File stem and expected direction of each pair.
      */
     static get PAIRS() {
@@ -28,10 +26,8 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * The steps the user drives, in the order they have to be pressed. Each
-     * entry is [key, short name, stage it reaches], and the stage names match
-     * the list passed to the base class, so the strip on screen and the rule
-     * that blocks a skipped key cannot drift apart.
+     * The steps in the order they have to be pressed. Each entry is [key,
+     * name, stage it reaches], and the stage names match the base class.
      * @return {Array<Array<string>>} One entry per step.
      */
     static get PIPELINE() {
@@ -83,12 +79,12 @@ class PanoramaScreen extends Screen {
         this.estimator = null;
         /** @type {BlockFlowEstimator} Second estimator, the extension. */
         this.flowEstimator = new BlockFlowEstimator(0.25, 8, 28, 25);
-        /** @type {ArrowOverlay} The large direction arrow. */
+        /** @type {ArrowOverlay} The direction arrow. */
         this.arrow = new ArrowOverlay(300, 34, 100, 82);
 
         /** @type {p5.Element} Interactive control over the edge threshold. */
         this.thresholdSlider = createSlider(0, 255, 100);
-        // Sits in the gap between the two readout lines, clear of both.
+        // Sits in the gap between the two readout lines.
         this.thresholdSlider.position(this.columnX[0], this.readoutTop + 22);
         this.thresholdSlider.style("width", "300px");
         this.thresholdSlider.hide();
@@ -103,8 +99,7 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Hides the slider while Task 1 is on screen, since it is a DOM element
-     * and would float above the canvas.
+     * Hides the slider while Task 1 is on screen, since it is a DOM element.
      * @return {void}
      */
     exit() {
@@ -175,8 +170,7 @@ class PanoramaScreen extends Screen {
         ));
         this.pairIndex = 0;
 
-        // A dead zone of one hundredth of the frame keeps the rule the same
-        // whatever size the pairs are.
+        // A dead zone of one hundredth of the frame.
         this.estimator = new MotionEstimator(
             0.01, this.pairs[0].frameA.width, this.pairs[0].frameA.height
         );
@@ -191,8 +185,8 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Brings the current pair up to the stage reached, which also picks up a
-     * new slider value or a change of pair.
+     * Brings the current pair up to the stage reached, picking up a new
+     * slider value or a change of pair.
      * @return {void}
      */
     update() {
@@ -250,12 +244,9 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Draws the ordered list of steps above the panels, outside every box, so
-     * the keys still to press stay on screen after a step has been taken. A
-     * step already reached is green, the one that may be pressed now is boxed,
-     * and the rest are dim. The step that may be pressed now is worked out
-     * from the same stage index that blocks a skipped key, so a dim step is
-     * one the app will refuse.
+     * Draws the list of steps above the panels. A step reached is green, the
+     * one that may be pressed now is boxed, and the rest are dim. The boxed
+     * step comes from the same stage index that blocks a skipped key.
      * @return {void}
      */
     drawPipeline() {
@@ -313,7 +304,7 @@ class PanoramaScreen extends Screen {
 
     /**
      * Draws the block matching vectors over Frame B, one line per matched
-     * block, so the measurement behind the second estimate is visible.
+     * block.
      * @param {FramePair} pair - Pair on screen.
      * @param {number} x - Left edge of the panel.
      * @return {void}
@@ -349,8 +340,8 @@ class PanoramaScreen extends Screen {
     }
 
     /**
-     * Draws the latest processed image for one frame, plus the centroid
-     * marker once it exists.
+     * Draws the processed image of the stage reached for one frame, plus the
+     * centroid marker once it exists.
      * @param {FramePair} pair - Pair on screen.
      * @param {number} slot - 0 for Frame A, 1 for Frame B.
      * @return {void}
@@ -489,7 +480,7 @@ class PanoramaScreen extends Screen {
         textAlign(CENTER, CENTER);
         textSize(34);
         textStyle(BOLD);
-        // At the foot of the panel, clear of a vertical arrow.
+        // At the foot of the panel, below a vertical arrow.
         text(pair.motion.label, centreX, y + h - 62);
 
         textStyle(NORMAL);
@@ -511,7 +502,7 @@ class PanoramaScreen extends Screen {
 
     /**
      * Draws the pair name, the centroids, the shift and the check against the
-     * direction the pair was built to show.
+     * expected direction.
      * @param {FramePair} pair - Pair on screen.
      * @return {void}
      */
@@ -542,7 +533,7 @@ class PanoramaScreen extends Screen {
                 "   dy " + pair.motion.dy.toFixed(1) +
                 "   shift " + pair.motion.distance.toFixed(1) + " px";
         }
-        // Below the slider that sits between the two lines.
+        // Below the slider.
         fill(170);
         text(readout, this.columnX[0], y + 52);
 

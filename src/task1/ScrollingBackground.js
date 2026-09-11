@@ -1,11 +1,10 @@
 /**
- * Scrolls the stage backdrop from left to right. Copies of the image are drawn
- * side by side and the offset wraps, so the loop has no seam and translate() is
- * not needed.
+ * Scrolls the stage backdrop from left to right. Copies are drawn side by
+ * side and the offset wraps, without translate().
  */
 class ScrollingBackground {
     /**
-     * @param {p5.Graphics} image - Backdrop, seamless left to right.
+     * @param {p5.Graphics} image - Backdrop whose left and right edges join.
      * @param {number} speed - Pixels per second.
      */
     constructor(image, speed) {
@@ -25,7 +24,7 @@ class ScrollingBackground {
     }
 
     /**
-     * Draws the backdrop across a box, dimmed so the subject reads clearly.
+     * Draws the backdrop across a box, dimmed.
      * @param {number} x - Left edge of the box.
      * @param {number} y - Top edge of the box.
      * @param {number} boxW - Box width in pixels.
@@ -38,7 +37,7 @@ class ScrollingBackground {
 
         push();
         // The first copy starts behind the box, so the gap left by the
-        // rightward movement is always covered.
+        // rightward movement is covered.
         for (let start = x - tileWidth; start < x + boxW; start += tileWidth) {
             image(this.image, start + this.offset, y, tileWidth, boxH);
         }

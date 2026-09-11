@@ -56,7 +56,7 @@ const CANVAS_H = 720;
 const STAGE_TOP = 86;
 const STAGE_HEIGHT = 384;
 
-// Task 2 frame panels, lower to leave room for their labels.
+// Task 2 frame panels, below their labels.
 const FRAME_TOP = 112;
 
 /** @type {AppController} */
@@ -70,8 +70,7 @@ let pairImages = [];
 let backdropImage;
 
 /**
- * Loads every image before setup runs, so no draw call meets a half loaded
- * file (week 12).
+ * Loads every image before setup runs (week 12).
  * @return {void}
  */
 function preload() {
@@ -92,13 +91,11 @@ function preload() {
  */
 function setup() {
     createCanvas(CANVAS_W, CANVAS_H);
-    // Required before direct pixel work: on a high density screen one image
-    // pixel would otherwise cover several array entries (week 13).
+    // One image pixel per array entry, whatever the screen density (week 13).
     pixelDensity(1);
     imageMode(CORNER);
 
-    // The backdrop is generated rather than loaded, so the only images the
-    // app reads are the ones the brief provides.
+    // The backdrop is generated, not loaded.
     backdropImage = new NoiseBackdrop(400, 120, 24, 1.6, 0.02).render();
 
     appController = new AppController(

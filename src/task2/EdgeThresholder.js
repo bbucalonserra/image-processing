@@ -1,6 +1,5 @@
 /**
- * Forces the edge output to pick sides so only the strongest outlines survive.
- * This is the threshold filter of week 15, driven by the on screen slider.
+ * Threshold filter (week 15) on the edge output, driven by the slider.
  */
 class EdgeThresholder {
     /**

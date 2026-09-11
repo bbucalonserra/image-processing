@@ -1,13 +1,11 @@
 /**
- * Turns a shift into one of the eight directions. For the centroid method the
- * shift is dx = Cx2 - Cx1 and dy = Cy2 - Cy1. An axis only counts once it
- * clears a dead zone, which stops noise reporting a diagonal when the motion is
- * horizontal or vertical.
+ * Turns a shift, dx = Cx2 - Cx1 and dy = Cy2 - Cy1, into one of the eight
+ * directions. An axis only counts once it clears a dead zone.
  */
 class MotionEstimator {
     /**
      * @param {number} deadZoneFraction - Share of the frame size an axis must
-     *     clear to count, so the rule holds at any frame size.
+     *     clear to count.
      * @param {number} frameWidth - Frame width in pixels.
      * @param {number} frameHeight - Frame height in pixels.
      */
@@ -17,8 +15,7 @@ class MotionEstimator {
     }
 
     /**
-     * Arrow angles in degrees, measured the way the screen runs: x grows to
-     * the right and y grows downwards.
+     * Arrow angles in degrees, x to the right and y downwards.
      * @return {object} Angle for every direction label.
      */
     static get ANGLES() {
@@ -59,8 +56,7 @@ class MotionEstimator {
             dx: dx,
             dy: dy,
             label: label,
-            // The arrow follows the reported label, not the raw vector, so
-            // overlay and label cannot disagree.
+            // The arrow follows the label, not the vector.
             angle: label === "NONE" ? 0 : MotionEstimator.ANGLES[label],
             distance: Math.sqrt(dx * dx + dy * dy)
         };

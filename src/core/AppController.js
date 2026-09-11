@@ -1,6 +1,6 @@
 /**
- * Routes the app between the two tasks. Key 1 selects Task 1 and key 2 selects
- * Task 2, as the brief requires. Any other key goes to the screen on show.
+ * Routes keys between the two tasks. Key 1 selects Task 1, key 2 selects
+ * Task 2, any other key goes to the screen on show.
  */
 class AppController {
     /**
@@ -47,8 +47,7 @@ class AppController {
     }
 
     /**
-     * Puts one task on screen. The outgoing screen is told it is leaving so it
-     * can hide anything it owns outside the canvas.
+     * Puts one task on screen and tells the outgoing screen it is leaving.
      * @param {string} taskKey - "1" or "2".
      * @return {void}
      */
@@ -63,7 +62,7 @@ class AppController {
 
     /**
      * Sends a key press to the task switcher or to the active screen.
-     * @param {string} pressedKey - Raw key character.
+     * @param {string} pressedKey - Key character.
      * @param {number} pressedCode - p5 key code.
      * @return {void}
      */
@@ -90,8 +89,8 @@ class AppController {
     }
 
     /**
-     * Draws the header and the active screen, or the opening prompt when no
-     * task has been selected.
+     * Draws the header and the active screen, or the prompt when no task
+     * has been selected.
      * @return {void}
      */
     draw() {
@@ -118,7 +117,7 @@ class AppController {
     }
 
     /**
-     * Draws the key list over the whole canvas.
+     * Draws the key list over the canvas.
      * @return {void}
      */
     drawHelp() {

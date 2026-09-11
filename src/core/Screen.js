@@ -20,8 +20,8 @@ class Screen {
     }
 
     /**
-     * Moves to a stage. A jump of more than one step forward is refused, which
-     * enforces the key order the brief sets out. Going back is allowed.
+     * Moves to a stage. A jump of more than one step forward is refused.
+     * Going back is allowed.
      * @param {string} stage - Requested stage name.
      * @return {boolean} Whether the stage was entered.
      */

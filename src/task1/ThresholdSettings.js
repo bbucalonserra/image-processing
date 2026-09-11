@@ -1,27 +1,10 @@
 /**
- * Per image threshold table required by the brief.
- *
- * thresholds[i] = [colourSpace, c1, c2, c3], colourSpace 0 for RGB and 1 for
- * HSB. The other three are the threshold values of that colour space:
- *
- *   RGB (0): c1, c2, c3 are the minimum red, green and blue of a background
- *            pixel.
- *   HSB (1): c1 is the hue tolerance around the backdrop hue sampled at the
- *            top corners, c2 the maximum saturation, c3 the minimum
- *            brightness.
- *
- * Both colour spaces were measured on all eight images and the row kept here
- * is the one that scored fewer mistakes. RGB holds images 4, 5 and 6, where
- * the backdrop is a clean white cut out that one limit per channel separates,
- * and image 2, whose right edge carries a vignette that HSB reads as too dark
- * to be background. HSB holds images 1, 3 and 8, whose walls are dim, tinted
- * or graded, and image 7, where the subject wears white: there the saturation
- * limit keeps the garment while the brightness limit still drops the wall,
- * which RGB cannot do.
+ * Per image threshold table, thresholds[i] = [colourSpace, c1, c2, c3],
+ * colourSpace 0 for RGB and 1 for HSB.
  */
 class ThresholdSettings {
     /**
-     * Saturation below which hue is unstable, so the hue test is skipped.
+     * Saturation below which the hue test is skipped.
      * @return {number} Saturation limit, 0 to 100.
      */
     static get NEUTRAL_SATURATION() {
@@ -61,7 +44,11 @@ class ThresholdSettings {
     }
 
     /**
-     * The table, one row per image, in the same order as FILES.
+     * The table, one row per image, in the order of FILES. RGB rows hold the
+     * minimum red, green and blue of a background pixel. HSB rows hold the
+     * hue tolerance around the backdrop hue, the maximum saturation and the
+     * minimum brightness. Both spaces were measured on every image and the
+     * row kept is the one with fewer mistakes.
      * @return {Array<Array<number>>} thresholds[i] = [colourSpace, c1, c2, c3].
      */
     static get TABLE() {
@@ -78,9 +65,8 @@ class ThresholdSettings {
     }
 
     /**
-     * The best row found in the colour space that was not chosen, one per
-     * image. Keeping it lets the app show the comparison the brief asks for
-     * instead of only the winner.
+     * The row with fewer mistakes in the colour space not chosen, one per
+     * image, kept so the comparison can be shown.
      * @return {Array<Array<number>>} Same format as TABLE.
      */
     static get ALTERNATIVES() {

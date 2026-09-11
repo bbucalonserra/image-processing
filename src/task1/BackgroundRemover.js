@@ -1,7 +1,7 @@
 /** Removes the backdrop from a provided image. */
 class BackgroundRemover {
     /**
-     * @param {MaskRefiner} refiner - Applied to the raw mask.
+     * @param {MaskRefiner} refiner - Applied to the threshold mask.
      */
     constructor(refiner) {
         this.refiner = refiner;
@@ -19,11 +19,9 @@ class BackgroundRemover {
     }
 
     /**
-     * Same work as removeBackground, and also reports the two mistakes the
-     * threshold makes on its own, both in regions where the answer is known:
-     * backdrop it fails to remove in the two top corners, and subject it
-     * claims that the connected component step has to give back. Both are
-     * pixel counts and lower is better on both.
+     * Same work as removeBackground, and also reports two pixel counts:
+     * backdrop the threshold fails to remove in the two top corners, and
+     * subject it claims that the connected component step gives back.
      * @param {p5.Image} source - The provided image.
      * @param {Array<number>} setting - The [colourSpace, c1, c2, c3] row.
      * @return {object} {image, backdropLeft, reclaimed}.
@@ -40,9 +38,8 @@ class BackgroundRemover {
         const refined = this.refiner.refineWithCounts(mask, w, h);
         const alpha = refined.alpha;
 
-        // The two top corners hold no subject in any of the eight images, so
-        // a pixel the threshold keeps there is backdrop it failed to remove.
-        // Whole top rows cannot be used, because hair reaches them.
+        // The two top corners hold no subject in any of the eight images.
+        // Top rows cannot be used, because hair reaches them.
         const blockW = Math.max(1, Math.floor(w * 0.06));
         const blockH = Math.max(1, Math.floor(h * 0.06));
         let backdropLeft = 0;
@@ -97,9 +94,8 @@ class BackgroundRemover {
     }
 
     /**
-     * Background when the hue is near the backdrop hue, the saturation is low
-     * and the brightness is high. Separating colour from lightness is what
-     * keeps a white shirt while dropping a white wall (week 13).
+     * Background when the hue is near the backdrop hue, the saturation is
+     * under the limit and the brightness is over it (week 13).
      * @param {p5.Image} source - Image with its pixels loaded.
      * @param {Array<number>} setting - The [1, hueRange, maxSat, minBri] row.
      * @return {Uint8Array} 1 where the pixel is background.
@@ -119,7 +115,7 @@ class BackgroundRemover {
                     source.pixels[index + 2]
                 );
 
-                // Hue only votes once the pixel carries enough colour.
+                // Hue only counts once the saturation is over the limit.
                 const hueGap = PixelUtilities.hueDistance(hsb[0], backdropHue);
                 const hueAgrees =
                     hsb[1] <= ThresholdSettings.NEUTRAL_SATURATION ||
@@ -134,8 +130,7 @@ class BackgroundRemover {
     }
 
     /**
-     * Backdrop hue taken from the two top corners, the only regions free of
-     * the subject in all eight images.
+     * Backdrop hue taken from the two top corners.
      * @param {p5.Image} source - Image with its pixels loaded.
      * @return {number} Mean backdrop hue in degrees.
      */

@@ -1,7 +1,6 @@
 /**
- * Centroid of a thresholded edge image, by the method the brief sets out: take
- * every pixel left in the image, add up their x positions and their y
- * positions, divide both totals by the number counted.
+ * Centroid of a thresholded edge image: sum of x and sum of y over every
+ * pixel left, each divided by the count.
  */
 class CentroidAnalyser {
     /**

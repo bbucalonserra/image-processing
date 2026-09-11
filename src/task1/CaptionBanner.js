@@ -1,7 +1,6 @@
 /**
- * Caption travelling right to left across the stage, sharing the fade and zoom
- * of the subject. The zoom is applied through textSize, so neither translate()
- * nor scale() is used.
+ * Caption travelling right to left, sharing the fade and zoom of the
+ * subject. The zoom goes through textSize, without translate() or scale().
  */
 class CaptionBanner {
     /**

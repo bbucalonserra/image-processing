@@ -1,9 +1,6 @@
 /**
- * Drives the sequence the brief asks for: fade in, zoom in, fade out, then fade
- * in, zoom out, fade out, repeating. One pass through the three phases is a
- * stage, and the zoom direction flips at the end of each stage. Alpha and scale
- * are returned as numbers, so the screen draws with image() and text() and
- * never calls translate().
+ * Drives the sequence fade in, zoom in, fade out, then fade in, zoom out,
+ * fade out, repeating. One pass is a stage, and the zoom flips each stage.
  */
 class AnimationCycle {
     /**
@@ -33,8 +30,7 @@ class AnimationCycle {
     }
 
     /**
-     * Advances the timer by one frame. The step is capped so a background tab
-     * does not skip whole stages when it returns.
+     * Advances the timer by one frame. The step is capped at 100 ms.
      * @return {boolean} Whether a stage finished on this frame.
      */
     update() {
@@ -54,8 +50,7 @@ class AnimationCycle {
     }
 
     /**
-     * Progress with a smoothstep applied, so the subject and the caption ease
-     * in and out of their travel instead of moving at a constant rate.
+     * Progress with a smoothstep applied.
      * @return {number} Eased position in the current stage, 0 to 1.
      */
     easedProgress() {

@@ -1,7 +1,6 @@
 /**
- * Draws the direction arrow. The outline is written once for an arrow pointing
- * right, then each point is rotated by the reported angle with sine and cosine
- * (week 8) and offset to the panel centre, so no transformation stack is used.
+ * Draws the direction arrow. Each outline point is rotated with sine and
+ * cosine (week 8) and offset to the centre, without the transformation stack.
  */
 class ArrowOverlay {
     /**
@@ -64,7 +63,7 @@ class ArrowOverlay {
     }
 
     /**
-     * Draws the marker used when no axis cleared the dead zone.
+     * Draws the marker for when no axis cleared the dead zone.
      * @param {number} centreX - Marker centre on the x axis.
      * @param {number} centreY - Marker centre on the y axis.
      * @param {p5.Color} strokeColour - Marker colour.

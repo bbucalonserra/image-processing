@@ -1,16 +1,6 @@
 /**
- * Builds the carousel backdrop with Perlin noise instead of loading a picture,
- * so no image outside the provided set is needed.
- *
- * The backdrop has to join at its left and right edges, because the carousel
- * scrolls it in a loop, and Perlin noise does not repeat. The fix is to read
- * the noise field around a circle rather than along a straight line: the
- * column is turned into an angle, and the two horizontal inputs of the noise
- * become the cosine and the sine of that angle (polar coordinates, week 8).
- * After a full turn the sample returns to where it started, so the two edges
- * match. The row supplies the third input, which makes this the 3D noise of
- * week 7. The result is drawn once into an off-screen buffer (week 12) and the
- * pixels are written through the pixel array (week 13).
+ * Builds the carousel backdrop from 3D Perlin noise (week 7) read around a
+ * circle (week 8), so its left and right edges join.
  */
 class NoiseBackdrop {
     /**
@@ -30,8 +20,7 @@ class NoiseBackdrop {
     }
 
     /**
-     * The three colours the noise is mapped onto, dark at the bottom of the
-     * range and warm at the top.
+     * The three colours the noise is mapped onto.
      * @return {Array<Array<number>>} Low, middle and high [r, g, b] stops.
      */
     static get STOPS() {
@@ -62,22 +51,21 @@ class NoiseBackdrop {
     }
 
     /**
-     * Renders the backdrop. The buffer is deliberately smaller than the panel
-     * it fills, because the image is soft and stretching it costs nothing,
-     * while a noise call per screen pixel would hold up the sketch on start.
+     * Renders the backdrop once into an off-screen buffer (week 12) through
+     * the pixel array (week 13). The buffer is smaller than the panel it
+     * fills and is drawn stretched.
      * @return {p5.Graphics} The finished backdrop.
      */
     render() {
         noiseSeed(this.seed);
-        // Four octaves is the p5 default, set here so the value is on record.
+        // Four octaves, the p5 default, set so the value is on record.
         noiseDetail(4, 0.5);
 
         const buffer = createGraphics(this.w, this.h);
         buffer.loadPixels();
 
         for (let y = 0; y < this.h; y++) {
-            // The top of the panel is lighter, which keeps the cut out subject
-            // readable against it.
+            // The top of the panel is lighter than the bottom.
             const height01 = 1 - y / this.h;
             for (let x = 0; x < this.w; x++) {
                 const angle = (x / this.w) * TWO_PI;

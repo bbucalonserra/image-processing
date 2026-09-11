@@ -51,7 +51,7 @@ class CarouselItem {
     }
 
     /**
-     * Largest size that fits a box without distorting the image.
+     * Size that fits a box, aspect ratio kept.
      * @param {number} boxW - Available width in pixels.
      * @param {number} boxH - Available height in pixels.
      * @return {object} {w, h} of the fitted image.

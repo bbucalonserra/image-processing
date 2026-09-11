@@ -12,8 +12,7 @@ class PixelUtilities {
     }
 
     /**
-     * Grey level from the luma weights, which keep the original brightness
-     * because green counts more than red and blue (week 15).
+     * Grey level from the luma weights (week 15).
      * @param {number} red - Red channel, 0 to 255.
      * @param {number} green - Green channel, 0 to 255.
      * @param {number} blue - Blue channel, 0 to 255.
@@ -24,8 +23,7 @@ class PixelUtilities {
     }
 
     /**
-     * Converts RGB to HSB. Done by hand because one p5 colour object per pixel
-     * is too slow for a full image (week 13).
+     * Converts RGB to HSB without a p5 colour object per pixel (week 13).
      * @param {number} red - Red channel, 0 to 255.
      * @param {number} green - Green channel, 0 to 255.
      * @param {number} blue - Blue channel, 0 to 255.
@@ -55,8 +53,7 @@ class PixelUtilities {
     }
 
     /**
-     * Distance between two hues on the colour wheel, wrapping at 360 so that
-     * hues either side of 0 stay neighbours.
+     * Distance between two hues, wrapping at 360.
      * @param {number} hueA - First hue in degrees.
      * @param {number} hueB - Second hue in degrees.
      * @return {number} Distance in degrees, 0 to 180.

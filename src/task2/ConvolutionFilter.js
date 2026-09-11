@@ -1,7 +1,6 @@
 /**
- * Applies a convolution kernel, the moving weighted average of week 15. The
- * result is returned as signed sums rather than pixels, because an edge kernel
- * gives negative responses that must survive until the two passes are added.
+ * Applies a convolution kernel (week 15). The result is returned as signed
+ * sums, since an edge kernel gives negative responses.
  */
 class ConvolutionFilter {
     /**
@@ -31,8 +30,8 @@ class ConvolutionFilter {
     }
 
     /**
-     * Largest sum a Sobel kernel can return, used to map the response back to
-     * 0 to 255: the positive weights total four and a pixel reaches 255.
+     * Largest sum a Sobel kernel can return: the positive weights total four
+     * and a pixel reaches 255.
      * @return {number} Largest possible response.
      */
     static get SOBEL_RANGE() {
@@ -41,9 +40,8 @@ class ConvolutionFilter {
 
     /**
      * Convolves the red channel of a greyscale image with a kernel. The offset
-     * centres the kernel on the pixel examined. The kernels are written row by
-     * row, so the row picks the vertical neighbour and the column the
-     * horizontal one, the transposed reading week 15 warns about.
+     * centres the kernel on the pixel. The kernel row picks the vertical
+     * neighbour and the column the horizontal one (week 15).
      * @param {p5.Image} source - Greyscale image with its pixels loaded.
      * @param {Array<Array<number>>} kernel - Square kernel of odd size.
      * @return {Float32Array} One signed response per pixel.
@@ -55,9 +53,8 @@ class ConvolutionFilter {
         const offset = Math.floor(size / 2);
         const response = new Float32Array(w * h);
 
-        // Border pixels have no full neighbourhood, so they stay at zero. A
-        // partial kernel there would draw a false edge around the frame,
-        // because its weights no longer sum to zero (week 15).
+        // Border pixels stay at zero. A partial kernel there would draw an
+        // edge around the frame, because its weights no longer sum to zero.
         for (let y = offset; y < h - offset; y++) {
             for (let x = offset; x < w - offset; x++) {
                 let total = 0;

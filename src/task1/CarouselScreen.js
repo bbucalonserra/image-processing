@@ -1,7 +1,6 @@
 /**
- * Task 1. Holds the stages keyed by c to open the carousel, l to load and
- * process the images and s to start the animation, and draws the stage panel
- * and the row of cards.
+ * Task 1. Keys c, l and s open the carousel, process the images and start
+ * the animation. Draws the stage panel and the row of cards.
  */
 class CarouselScreen extends Screen {
     /**
@@ -73,10 +72,8 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Processes the featured image twice, once with the row that was chosen
-     * and once with the best row of the other colour space, and keeps both
-     * results. This is the comparison the brief asks for, made visible rather
-     * than only stated.
+     * Processes the featured image twice, once with the chosen row and once
+     * with the row of the other colour space, and keeps both results.
      * @return {object} {chosen, alternative} results for the featured image.
      */
     buildComparison() {
@@ -103,9 +100,7 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Processes every image through its own threshold row: walk the settings
-     * array, read the colour space and the three values, cut the background
-     * out with them.
+     * Processes every image through its own row of the thresholds table.
      * @return {void}
      */
     loadItems() {
@@ -135,8 +130,8 @@ class CarouselScreen extends Screen {
      * @return {void}
      */
     update() {
-        // The notice gets one frame on screen before processing starts,
-        // because the loop is blocked while the pixels are worked on.
+        // The notice gets one frame on screen before processing blocks the
+        // loop.
         if (this.pendingLoad) {
             if (this.noticeFrames > 0) {
                 this.loadItems();
@@ -226,8 +221,7 @@ class CarouselScreen extends Screen {
 
     /**
      * Draws the subject travelling left to right while it fades and zooms.
-     * Position and size are computed as numbers and passed to image(), so
-     * translate() is not used.
+     * Position and size are passed to image(), without translate().
      * @param {CarouselItem} item - Featured entry.
      * @param {number} progress - Position in the stage, 0 to 1.
      * @param {number} alphaValue - Opacity, 0 to 255.
@@ -235,8 +229,8 @@ class CarouselScreen extends Screen {
      * @return {void}
      */
     drawSubject(item, progress, alphaValue, scaleFactor) {
-        // The margin is set so that the subject stays inside the panel at the
-        // large end of the zoom, rather than reaching over its top edge.
+        // The margin keeps the subject inside the panel at the top of the
+        // zoom.
         const drawH = (this.panelHeight - 110) * scaleFactor;
         const drawW = drawH * (item.foreground.width / item.foreground.height);
         const centreX = lerp(drawW * 0.6, width - drawW * 0.6, progress);
@@ -255,9 +249,8 @@ class CarouselScreen extends Screen {
     }
 
     /**
-     * Draws the two cut outs side by side with the row and the measurements
-     * of each, so the reader can see which colour space performs better on
-     * the featured image.
+     * Draws the two cut outs side by side with the row and the error count
+     * of each.
      * @return {void}
      */
     drawComparison() {
@@ -329,7 +322,7 @@ class CarouselScreen extends Screen {
 
         push();
         noStroke();
-        // A mid grey ground makes both leftover backdrop and holes visible.
+        // A mid grey ground shows both leftover backdrop and holes.
         fill(120, 120, 130);
         rect(x, y, w, boxH);
         image(result.image, x, y, w, boxH);
