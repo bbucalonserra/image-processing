@@ -83,9 +83,10 @@ against values worked out by hand, and prints the totals.
 ## Colour space choice
 
 Every image was thresholded in both RGB and HSB. The row kept in
-`ThresholdSettings.TABLE` is the one that makes fewer mistakes, counted as
-backdrop left in the two top corners plus subject the threshold wrongly claims
-and the connected component step has to give back. The losing row is kept in
+`ThresholdSettings.TABLE` is the one that matches or beats the other, counted
+as backdrop left in the two top corners plus subject the threshold wrongly
+claims and the connected component step has to give back. The other row is
+kept in
 `ThresholdSettings.ALTERNATIVES`, and key `v` draws both results side by side
 with those counts, so the comparison can be seen rather than taken on trust.
 
@@ -154,7 +155,7 @@ week of the module the technique comes from.
 | Sobel kernels | `ConvolutionFilter.SOBEL_X`, `ConvolutionFilter.SOBEL_Y`, `EdgeDetector.detect` | two passes, one for vertical edges and one for horizontal, remapped from the 1020 range and added |
 | Threshold filter | `EdgeThresholder.apply` | forces every pixel to pick a side, driven by the slider |
 | Mean blur kernel | `MaskRefiner.feather` | the 3x3 mean is applied to the alpha channel, so the cut out edge fades instead of stair stepping |
-| Gaussian blur, tested and rejected | not in the code, reported in the commentary | a Gaussian pass before Sobel left accuracy at 64 of 64 but widened the spread of dy from 1.0 to 1.7 pixels, so it was removed |
+| Gaussian blur, tested and rejected | not in the code | a Gaussian pass before Sobel left accuracy at 64 of 64 but widened the spread of dy from 1.0 to 1.7 pixels, so it was removed |
 
 ### Week 17 - computer vision
 
