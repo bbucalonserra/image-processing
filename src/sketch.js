@@ -1,76 +1,53 @@
 /**
- * COMMENTARY (498 words).
+ * COMMENTARY (486 words).
  *
  * 1. WALKTHROUGH
- *    Key 1 loads Task 1, key 2 loads Task 2, key H lists every key.
- *    Task 1 follows c, l and s. Key l scales each provided image down and cuts
- *    its background out by walking the thresholds table, where each row is
- *    [colourSpace, c1, c2, c3]: 0 selects RGB, with the minimum red, green and
- *    blue of a background pixel, 1 selects HSB, with a hue tolerance, a
- *    maximum saturation and a minimum brightness. The mask is then cleaned by
- *    a flood fill from the border, which is what removes every residual
- *    background pixel. Key s starts the sequence: the cut
- *    out fades in, zooms in and fades out, then fades in, zooms out and fades
- *    out, travelling left to right, while a generated backdrop scrolls left
- *    to right and the caption travels right to left. Positions and sizes are
- *    numbers passed to image(), so translate() is never called. Key v shows the
- *    featured image cut out in both colour spaces with the error of each.
- *    Task 2 follows p, i, g, e, t, n and d, and the arrow keys change pair.
- *    Both frames are made greyscale with the luma weights, run through two
- *    Sobel passes, thresholded by a slider, reduced to a centroid, and
- *    compared with dx = Cx2 - Cx1 and dy = Cy2 - Cy1, which gives the eight
- *    directions and the arrow. Four extra pairs were built from the provided
- *    images so that every direction is covered.
+ *    Keys "1" and "2" load the tasks and "H" presents the key list; the header
+ *    shows the keys available. In Task 1, "c" opens the empty carousel and "l"
+ *    cuts the background of each image out by walking the thresholds table,
+ *    where each row is [colourSpace, c1, c2, c3]: 0 selects RGB, with the
+ *    minimum red, green and blue of a background pixel, and 1 selects HSB, with
+ *    a hue tolerance, a maximum saturation and a minimum brightness. Key "s"
+ *    starts the animation: fade in, zoom in, fade out, then fade in, zoom out
+ *    and fade out, while the image goes from left to right. The background also
+ *    moves left to right and the caption moves right to left. Size and position
+ *    are passed to image() and textSize(), so translate() is never called. Key
+ *    "v" presents the same image cut out in both colour spaces, side by side,
+ *    with the error count of each. Task 2 follows "p", "i", "g", "e", "t", "n"
+ *    and "d", and arrows change pair: luma to grey, two Sobel passes summed for
+ *    edges, a threshold slider, the centroid as the sum of x and y divided by
+ *    the count, then dx = Cx2 - Cx1 and dy = Cy2 - Cy1 give the direction and
+ *    the arrow. Four extra pairs were built to cover the missing directions.
+ *    The keys only work in order.
  *
  * 2. PROBLEMS
- *    Three mattered. Convolving the border with a partial kernel drew a false
- *    edge around every frame, which pulled the two centroids together and
- *    halved the measured shift; leaving the border at zero fixed it. Image
- *    2 kept a strip of wall because the vignette there measures 241 to 244,
- *    under the brightness limit, so the fill could not enter from that side;
- *    RGB clears it and now holds that row. I also tried a Gaussian pass before
- *    Sobel: it left accuracy at 64 of 64 but widened the spread of dy from 1.0
- *    to 1.7 pixels, so it is not in the code.
+ *    The convolution processed the border pixels with a cut kernel. A Sobel
+ *    kernel only works because its weights sum to zero, and in the cut kernel
+ *    they no longer did. This resulted in a bright rectangle around each frame,
+ *    pulling both centroids to the centre and reducing the reported
+ *    displacement from 80 to 38.7. Leaving the border at zero corrected it.
  *
  * 3. TARGET
- *    On target. All eight pairs are classified correctly at every threshold
- *    from 40 to 200, and every row of the table makes fewer mistakes than the
- *    other colour space on the same image, counted as backdrop left in the
- *    corners plus subject the threshold wrongly claimed.
+ *    All eight pairs are classified correctly across the whole slider, from 40
+ *    to 255. Each row of the table matches or beats the alternative in the
+ *    other colour space. Each threshold was selected by measuring image by
+ *    image, which does not generalise to a new picture. A threshold derived
+ *    from the histogram would remove the fixed table, but the table is a
+ *    requirement of the coursework.
  *
  * 4. EXTENSION
- *    The extension is a second motion estimator built on block matching. The
- *    frame is cut into blocks, each block with enough contrast is searched for
- *    in the next frame by the sum of absolute differences, and the shift is
- *    the median of the matches. Matching runs at quarter scale, so a ninety
- *    pixel window costs twelve milliseconds a pair. It is unique
- *    because it measures the same motion on a different principle, region
- *    correspondence rather than one centre of mass, so the two answers can be
- *    compared on screen, and because it needs no threshold, which the
- *    centroid method cannot do without.
+ *    The extension is a second motion estimator by block matching, applied with
+ *    the "f" key. The mask refinement of Task 1 meets the requirement of no
+ *    residual pixels and is not an extension. The frame is cut into blocks, and
+ *    each block with enough contrast is searched for in the next frame by the
+ *    sum of absolute differences. The displacement is the median of the
+ *    vectors. It runs at 1/4 scale, so a window of 90 pixels costs a few
+ *    milliseconds. It is unique in principle: matching among regions rather
+ *    than a centre of mass. Both are shown on screen, validating each other,
+ *    and it needs no threshold: with the slider at zero the centroid reports
+ *    NONE on all eight pairs, while block matching stays at 8 of 8, as it never
+ *    uses the threshold.
  */
-
-
-/**
- * COMMENTARY (XXX words).
- * 1. WALKTHROUGH
- * As an entry point, the app runs both tasks. When clicking key 1, loads the
- * task 1, the key 2 loads task 2. Key H shows or hides the list of keys
- * in the screen. It's important to point out that the header always
- * shows which task is active and which  keys are available at that 
- * moment. For task 1, the sequence are the keys: "c", "l" and "s", where "c" opens
- * the carroussel, "l", where the image processing actually occours,
- * makes each of the eight images are reduced and the
- * background is cropped going through the table thresholds[i] = [colourSpace, c1, c2, c3].
- * When colourspace is 0, the three values are the lower from red, green and blue.
- * When 1, c1 is the matrix tolerance, c2 maximum saturation and c3 the 
- * minimum brightness. Each image has its own line since all eight has different
- * backgrounds. 
- * 
- *  
- *      
- * 
-*/
 
 const CANVAS_W = 1280;
 const CANVAS_H = 720;
