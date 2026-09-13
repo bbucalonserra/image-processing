@@ -1,20 +1,11 @@
-/**
- * Checks the image processing functions against values worked out by hand.
- * No p5 canvas is needed: image readers are given a stub of the p5 shape.
- */
+/** Checks the image processing functions against values done by hand. */
 class TestRunner {
     constructor() {
         this.passed = 0;
         this.failed = 0;
     }
 
-    /**
-     * Records one check.
-     * @param {string} name - What is being checked.
-     * @param {boolean} condition - Result of the check.
-     * @param {string} detail - Value seen, shown when the check fails.
-     * @return {void}
-     */
+    /** Records one check. */
     check(name, condition, detail) {
         if (condition) this.passed++;
         else this.failed++;
@@ -26,14 +17,7 @@ class TestRunner {
         document.body.appendChild(line);
     }
 
-    /**
-     * Records a check on a number with a tolerance.
-     * @param {string} name - What is being checked.
-     * @param {number} actual - Value produced.
-     * @param {number} expected - Value wanted.
-     * @param {number} tolerance - Allowed difference.
-     * @return {void}
-     */
+    /** Records a check on a number with a tolerance. */
     checkClose(name, actual, expected, tolerance) {
         this.check(
             name,
@@ -42,10 +26,7 @@ class TestRunner {
         );
     }
 
-    /**
-     * Prints the totals.
-     * @return {void}
-     */
+    /** Prints the totals. */
     summarise() {
         const line = document.createElement("h2");
         line.textContent = this.passed + " passed, " + this.failed + " failed";
@@ -54,13 +35,7 @@ class TestRunner {
     }
 }
 
-/**
- * Builds a stub with the fields the image reading code uses.
- * @param {number} w - Width in pixels.
- * @param {number} h - Height in pixels.
- * @param {function} valueAt - Receives x and y, returns a grey level.
- * @return {object} An object shaped like a p5.Image.
- */
+/** Builds a stub with the fields the image reading code uses. */
 function stubImage(w, h, valueAt) {
     const pixels = new Uint8ClampedArray(w * h * 4);
     for (let y = 0; y < h; y++) {
@@ -76,10 +51,7 @@ function stubImage(w, h, valueAt) {
     return { width: w, height: h, pixels: pixels, loadPixels() {} };
 }
 
-/**
- * Runs every check.
- * @return {void}
- */
+/** Runs every check. */
 function runTests() {
     const t = new TestRunner();
 

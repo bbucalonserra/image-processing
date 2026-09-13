@@ -1,10 +1,6 @@
 /** Converts a colour image to greyscale. */
 class GreyscaleFilter {
-    /**
-     * Greyscale copy using the luma weights (week 15).
-     * @param {p5.Image} source - Colour frame.
-     * @return {p5.Image} Greyscale copy.
-     */
+    /** Greyscale copy using the luma weights (week 15). */
     static apply(source) {
         const w = source.width;
         const h = source.height;

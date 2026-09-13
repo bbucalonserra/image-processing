@@ -1,31 +1,16 @@
 /** Removes the backdrop from a provided image. */
 class BackgroundRemover {
-    /**
-     * @param {MaskRefiner} refiner - Applied to the threshold mask.
-     */
+    /** Takes the refiner applied to the threshold mask. */
     constructor(refiner) {
         this.refiner = refiner;
     }
 
-    /**
-     * Cuts the background out using the stored row: read the colour space,
-     * threshold in it, refine the mask, write the result as an alpha channel.
-     * @param {p5.Image} source - The provided image.
-     * @param {Array<number>} setting - The [colourSpace, c1, c2, c3] row.
-     * @return {p5.Image} Copy whose background pixels are transparent.
-     */
+    /** Cuts the background out with the stored row and writes the alpha. */
     removeBackground(source, setting) {
         return this.removeBackgroundWithCounts(source, setting).image;
     }
 
-    /**
-     * Same work as removeBackground, and also reports two pixel counts:
-     * backdrop the threshold fails to remove in the two top corners, and
-     * subject it claims that the connected component step gives back.
-     * @param {p5.Image} source - The provided image.
-     * @param {Array<number>} setting - The [colourSpace, c1, c2, c3] row.
-     * @return {object} {image, backdropLeft, reclaimed}.
-     */
+    /** Same work, and also counts backdrop left and subject given back. */
     removeBackgroundWithCounts(source, setting) {
         const w = source.width;
         const h = source.height;
@@ -39,7 +24,6 @@ class BackgroundRemover {
         const alpha = refined.alpha;
 
         // The two top corners hold no subject in any of the eight images.
-        // Top rows cannot be used, because hair reaches them.
         const blockW = Math.max(1, Math.floor(w * 0.06));
         const blockH = Math.max(1, Math.floor(h * 0.06));
         let backdropLeft = 0;
@@ -69,12 +53,7 @@ class BackgroundRemover {
         };
     }
 
-    /**
-     * Background when all three channels are above their own minimum.
-     * @param {p5.Image} source - Image with its pixels loaded.
-     * @param {Array<number>} setting - The [0, minRed, minGreen, minBlue] row.
-     * @return {Uint8Array} 1 where the pixel is background.
-     */
+    /** Background when all three channels are above their own minimum. */
     maskByRgb(source, setting) {
         const w = source.width;
         const h = source.height;
@@ -93,13 +72,7 @@ class BackgroundRemover {
         return mask;
     }
 
-    /**
-     * Background when the hue is near the backdrop hue, the saturation is
-     * under the limit and the brightness is over it (week 13).
-     * @param {p5.Image} source - Image with its pixels loaded.
-     * @param {Array<number>} setting - The [1, hueRange, maxSat, minBri] row.
-     * @return {Uint8Array} 1 where the pixel is background.
-     */
+    /** Background when hue, saturation and brightness all pass (week 13). */
     maskByHsb(source, setting) {
         const w = source.width;
         const h = source.height;
@@ -129,11 +102,7 @@ class BackgroundRemover {
         return mask;
     }
 
-    /**
-     * Backdrop hue taken from the two top corners.
-     * @param {p5.Image} source - Image with its pixels loaded.
-     * @return {number} Mean backdrop hue in degrees.
-     */
+    /** Backdrop hue taken from the two top corners. */
     sampleBackdropHue(source) {
         const w = source.width;
         const h = source.height;

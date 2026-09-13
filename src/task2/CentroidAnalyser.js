@@ -1,12 +1,6 @@
-/**
- * Centroid of a thresholded edge image: sum of x and sum of y over every
- * pixel left, each divided by the count.
- */
+/** Centroid of a thresholded image: mean x and mean y of its pixels. */
 class CentroidAnalyser {
-    /**
-     * @param {p5.Image} binary - Thresholded edge image, white on black.
-     * @return {object} {x, y, count}, or null when no pixel survived.
-     */
+    /** Sums x and y over the white pixels and divides by the count. */
     static compute(binary) {
         const w = binary.width;
         const h = binary.height;

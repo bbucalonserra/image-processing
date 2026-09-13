@@ -1,13 +1,6 @@
-/**
- * Applies a convolution kernel (week 15). The result is returned as signed
- * sums, since an edge kernel gives negative responses.
- */
+/** Applies a convolution kernel. Responses are signed. */
 class ConvolutionFilter {
-    /**
-     * Sobel kernel with its asymmetry left to right, so it responds to
-     * vertical edges (week 15).
-     * @return {Array<Array<number>>} The 3x3 kernel.
-     */
+    /** Sobel kernel for vertical edges (week 15). */
     static get SOBEL_X() {
         return [
             [-1, 0, 1],
@@ -16,11 +9,7 @@ class ConvolutionFilter {
         ];
     }
 
-    /**
-     * Sobel kernel with its asymmetry top to bottom, so it responds to
-     * horizontal edges (week 15).
-     * @return {Array<Array<number>>} The 3x3 kernel.
-     */
+    /** Sobel kernel for horizontal edges (week 15). */
     static get SOBEL_Y() {
         return [
             [-1, -2, -1],
@@ -29,23 +18,12 @@ class ConvolutionFilter {
         ];
     }
 
-    /**
-     * Largest sum a Sobel kernel can return: the positive weights total four
-     * and a pixel reaches 255.
-     * @return {number} Largest possible response.
-     */
+    /** Largest sum a Sobel kernel can return, 4 times 255. */
     static get SOBEL_RANGE() {
         return 1020;
     }
 
-    /**
-     * Convolves the red channel of a greyscale image with a kernel. The offset
-     * centres the kernel on the pixel. The kernel row picks the vertical
-     * neighbour and the column the horizontal one (week 15).
-     * @param {p5.Image} source - Greyscale image with its pixels loaded.
-     * @param {Array<Array<number>>} kernel - Square kernel of odd size.
-     * @return {Float32Array} One signed response per pixel.
-     */
+    /** Convolves the red channel of a greyscale image with a kernel. */
     static convolve(source, kernel) {
         const w = source.width;
         const h = source.height;
@@ -53,8 +31,7 @@ class ConvolutionFilter {
         const offset = Math.floor(size / 2);
         const response = new Float32Array(w * h);
 
-        // Border pixels stay at zero. A partial kernel there would draw an
-        // edge around the frame, because its weights no longer sum to zero.
+        // Border pixels stay at zero. A cut kernel draws a false edge.
         for (let y = offset; y < h - offset; y++) {
             for (let x = offset; x < w - offset; x++) {
                 let total = 0;

@@ -1,31 +1,13 @@
-/**
- * Caption travelling right to left, sharing the fade and zoom of the
- * subject. The zoom goes through textSize, without translate() or scale().
- */
+/** Caption moving right to left. The zoom goes through textSize. */
 class CaptionBanner {
-    /**
-     * @param {number} baseSize - Text size at scale one.
-     * @param {p5.Color} textColour - Caption colour.
-     * @param {number} margin - Distance kept from either edge, so the caption
-     *     stays on the panel at the ends of its travel.
-     */
+    /** Text size at scale one, colour and margin kept from the edges. */
     constructor(baseSize, textColour, margin) {
         this.baseSize = baseSize;
         this.textColour = textColour;
         this.margin = margin;
     }
 
-    /**
-     * Draws the caption for the current frame.
-     * @param {string} caption - Line of text.
-     * @param {number} boxX - Left edge of the stage box.
-     * @param {number} boxW - Stage box width in pixels.
-     * @param {number} y - Height of the caption.
-     * @param {number} progress - Position in the stage, 0 to 1.
-     * @param {number} alphaValue - Opacity, 0 to 255.
-     * @param {number} scaleFactor - Zoom shared with the subject.
-     * @return {void}
-     */
+    /** Draws the caption for the current frame. */
     draw(caption, boxX, boxW, y, progress, alphaValue, scaleFactor) {
         // Right to left, opposite to the subject.
         const x = lerp(

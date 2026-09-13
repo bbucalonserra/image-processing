@@ -1,13 +1,6 @@
-/**
- * Threshold filter (week 15) on the edge output, driven by the slider.
- */
+/** Threshold filter (week 15) on the edge output, driven by the slider. */
 class EdgeThresholder {
-    /**
-     * Builds a black and white copy of an edge image.
-     * @param {p5.Image} edges - Output of EdgeDetector.
-     * @param {number} threshold - Strength a pixel must reach, 0 to 255.
-     * @return {p5.Image} White outlines on black.
-     */
+    /** Builds a black and white copy of an edge image. */
     static apply(edges, threshold) {
         const w = edges.width;
         const h = edges.height;

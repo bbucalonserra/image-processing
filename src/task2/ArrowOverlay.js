@@ -1,14 +1,6 @@
-/**
- * Draws the direction arrow. Each outline point is rotated with sine and
- * cosine (week 8) and offset to the centre, without the transformation stack.
- */
+/** Draws the direction arrow. Points are rotated with sin and cos. */
 class ArrowOverlay {
-    /**
-     * @param {number} length - Arrow length in pixels.
-     * @param {number} shaftHalf - Half thickness of the shaft.
-     * @param {number} headLength - Length of the head.
-     * @param {number} headHalf - Half width of the head.
-     */
+    /** Arrow length, shaft half thickness, head length and head half width. */
     constructor(length, shaftHalf, headLength, headHalf) {
         this.length = length;
         this.shaftHalf = shaftHalf;
@@ -16,11 +8,7 @@ class ArrowOverlay {
         this.headHalf = headHalf;
     }
 
-    /**
-     * Outline of an arrow pointing along the positive x axis, clockwise from
-     * the back of the shaft.
-     * @return {Array<Array<number>>} Local [x, y] points.
-     */
+    /** Outline of an arrow pointing along the positive x axis. */
     outline() {
         const half = this.length / 2;
         const neck = half - this.headLength;
@@ -35,14 +23,7 @@ class ArrowOverlay {
         ];
     }
 
-    /**
-     * Draws the arrow in the given direction.
-     * @param {number} centreX - Arrow centre on the x axis.
-     * @param {number} centreY - Arrow centre on the y axis.
-     * @param {number} angleDegrees - Direction the arrow points at.
-     * @param {p5.Color} fillColour - Fill colour.
-     * @return {void}
-     */
+    /** Draws the arrow in the given direction. */
     draw(centreX, centreY, angleDegrees, fillColour) {
         const angle = radians(angleDegrees);
         const cosine = Math.cos(angle);
@@ -62,13 +43,7 @@ class ArrowOverlay {
         pop();
     }
 
-    /**
-     * Draws the marker for when no axis cleared the dead zone.
-     * @param {number} centreX - Marker centre on the x axis.
-     * @param {number} centreY - Marker centre on the y axis.
-     * @param {p5.Color} strokeColour - Marker colour.
-     * @return {void}
-     */
+    /** Draws the marker for when no axis cleared the dead zone. */
     drawStill(centreX, centreY, strokeColour) {
         push();
         noFill();

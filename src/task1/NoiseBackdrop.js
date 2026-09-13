@@ -1,16 +1,6 @@
-/**
- * Builds the carousel backdrop from 3D Perlin noise (week 7) read around a
- * circle (week 8), so its left and right edges join.
- */
+/** Builds the backdrop from Perlin noise read around a circle. */
 class NoiseBackdrop {
-    /**
-     * @param {number} w - Buffer width in pixels.
-     * @param {number} h - Buffer height in pixels.
-     * @param {number} seed - Noise seed, so every run gives the same backdrop.
-     * @param {number} radius - Radius of the circle the noise is read along.
-     *     Larger values give smaller features.
-     * @param {number} rowStep - Step taken down the noise field per row.
-     */
+    /** Buffer size, noise seed, circle radius and step per row. */
     constructor(w, h, seed, radius, rowStep) {
         this.w = w;
         this.h = h;
@@ -19,10 +9,7 @@ class NoiseBackdrop {
         this.rowStep = rowStep;
     }
 
-    /**
-     * The three colours the noise is mapped onto.
-     * @return {Array<Array<number>>} Low, middle and high [r, g, b] stops.
-     */
+    /** The three colours the noise is mapped onto. */
     static get STOPS() {
         return [
             [16, 22, 46],
@@ -31,11 +18,7 @@ class NoiseBackdrop {
         ];
     }
 
-    /**
-     * Mixes the three stops into one colour.
-     * @param {number} value - Position in the ramp, 0 to 1.
-     * @return {Array<number>} The [r, g, b] colour.
-     */
+    /** Mixes the three stops into one colour. */
     rampColour(value) {
         const stops = NoiseBackdrop.STOPS;
         const half = value < 0.5 ? 0 : 1;
@@ -50,12 +33,7 @@ class NoiseBackdrop {
         ];
     }
 
-    /**
-     * Renders the backdrop once into an off-screen buffer (week 12) through
-     * the pixel array (week 13). The buffer is smaller than the panel it
-     * fills and is drawn stretched.
-     * @return {p5.Graphics} The finished backdrop.
-     */
+    /** Renders the backdrop once into an off-screen buffer (week 12). */
     render() {
         noiseSeed(this.seed);
         // Four octaves, the p5 default, set so the value is on record.

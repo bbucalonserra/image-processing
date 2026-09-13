@@ -1,14 +1,6 @@
-/**
- * Turns a threshold mask into an alpha channel with no residual background:
- * flood fill from the border (week 17), island removal, growth, 3x3 blur.
- */
+/** Turns a threshold mask into an alpha channel with no leftovers. */
 class MaskRefiner {
-    /**
-     * @param {number} minIslandArea - Foreground blobs below this pixel count
-     *     are removed.
-     * @param {number} growPasses - Pixels the background grows by.
-     * @param {number} featherPasses - Blur passes applied to the edge.
-     */
+    /** Island size limit, growth passes and blur passes. */
     constructor(minIslandArea, growPasses, featherPasses) {
         this.minIslandArea = minIslandArea;
         this.growPasses = growPasses;
@@ -20,14 +12,7 @@ class MaskRefiner {
         this.stepY = [0, 0, 1, -1];
     }
 
-    /**
-     * Runs the four refinement steps and counts the backdrop pixels the flood
-     * fill gives back to the subject.
-     * @param {Uint8Array} mask - 1 where the threshold called background.
-     * @param {number} w - Mask width in pixels.
-     * @param {number} h - Mask height in pixels.
-     * @return {object} {alpha, reclaimed}.
-     */
+    /** Runs the four steps and counts the pixels given back. */
     refineWithCounts(mask, w, h) {
         const connected = this.keepBorderConnected(mask, w, h);
 
@@ -46,14 +31,7 @@ class MaskRefiner {
         };
     }
 
-    /**
-     * Keeps only background reachable from the image border (week 17).
-     * Backdrop colour enclosed by the subject is returned to the subject.
-     * @param {Uint8Array} mask - Threshold mask.
-     * @param {number} w - Mask width in pixels.
-     * @param {number} h - Mask height in pixels.
-     * @return {Uint8Array} Border connected background only.
-     */
+    /** Keeps only background joined to the image border (week 17). */
     keepBorderConnected(mask, w, h) {
         const reached = new Uint8Array(w * h);
         const stack = new Int32Array(w * h);
@@ -86,17 +64,7 @@ class MaskRefiner {
         return reached;
     }
 
-    /**
-     * Adds a border pixel to the fill stack when it is unvisited background.
-     * @param {Uint8Array} mask - Threshold mask.
-     * @param {Uint8Array} reached - Visited flags, edited in place.
-     * @param {Int32Array} stack - The fill stack, edited in place.
-     * @param {number} top - Current stack height.
-     * @param {number} x - Column of the candidate seed.
-     * @param {number} y - Row of the candidate seed.
-     * @param {number} w - Mask width in pixels.
-     * @return {number} The new stack height.
-     */
+    /** Adds a border pixel to the fill stack when it is background. */
     pushSeed(mask, reached, stack, top, x, y, w) {
         const cell = x + y * w;
         if (mask[cell] === 1 && reached[cell] === 0) {
@@ -106,13 +74,7 @@ class MaskRefiner {
         return top;
     }
 
-    /**
-     * Removes foreground blobs below minIslandArea.
-     * @param {Uint8Array} mask - Background mask.
-     * @param {number} w - Mask width in pixels.
-     * @param {number} h - Mask height in pixels.
-     * @return {Uint8Array} The cleaned mask.
-     */
+    /** Removes foreground blobs below minIslandArea. */
     removeSmallIslands(mask, w, h) {
         const cleaned = Uint8Array.from(mask);
         const visited = new Uint8Array(w * h);
@@ -151,14 +113,7 @@ class MaskRefiner {
         return cleaned;
     }
 
-    /**
-     * Grows the background by one pixel per pass, removing the rim of mixed
-     * pixels left by JPEG compression.
-     * @param {Uint8Array} mask - Background mask to grow.
-     * @param {number} w - Mask width in pixels.
-     * @param {number} h - Mask height in pixels.
-     * @return {Uint8Array} The grown mask.
-     */
+    /** Grows the background by one pixel per pass. */
     growBackground(mask, w, h) {
         let current = mask;
         for (let pass = 0; pass < this.growPasses; pass++) {
@@ -183,11 +138,7 @@ class MaskRefiner {
         return current;
     }
 
-    /**
-     * Converts the binary mask to an alpha channel.
-     * @param {Uint8Array} mask - Background mask.
-     * @return {Uint8Array} Alpha values, 0 or 255.
-     */
+    /** Converts the binary mask to an alpha channel. */
     toAlpha(mask) {
         const alpha = new Uint8Array(mask.length);
         for (let i = 0; i < alpha.length; i++) {
@@ -196,13 +147,7 @@ class MaskRefiner {
         return alpha;
     }
 
-    /**
-     * Blurs the alpha channel with the 3x3 mean kernel of week 15.
-     * @param {Uint8Array} alpha - Alpha channel to soften.
-     * @param {number} w - Image width in pixels.
-     * @param {number} h - Image height in pixels.
-     * @return {Uint8Array} The softened alpha channel.
-     */
+    /** Blurs the alpha channel with the 3x3 mean kernel of week 15. */
     feather(alpha, w, h) {
         let current = alpha;
         for (let pass = 0; pass < this.featherPasses; pass++) {

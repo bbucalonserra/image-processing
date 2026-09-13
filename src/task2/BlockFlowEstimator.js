@@ -1,14 +1,6 @@
-/**
- * The extension: a second motion estimator by block matching (week 17), on a
- * downscaled copy, skipping flat blocks, taking the median of the matches.
- */
+/** The extension. Second motion estimator, by block matching. */
 class BlockFlowEstimator {
-    /**
-     * @param {number} scale - Factor the frames are reduced by before matching.
-     * @param {number} blockSize - Block side in the reduced frame, in pixels.
-     * @param {number} searchRadius - Search window radius in the reduced frame.
-     * @param {number} minContrast - Range a block must span to be matched.
-     */
+    /** Reduction factor, block size, search radius and contrast limit. */
     constructor(scale, blockSize, searchRadius, minContrast) {
         this.scale = scale;
         this.blockSize = blockSize;
@@ -16,11 +8,7 @@ class BlockFlowEstimator {
         this.minContrast = minContrast;
     }
 
-    /**
-     * Reduces a greyscale frame and returns its grey levels as a flat array.
-     * @param {p5.Image} grey - Greyscale frame.
-     * @return {object} {data, w, h} of the reduced frame.
-     */
+    /** Reduces a greyscale frame to a flat array of grey levels. */
     reduce(grey) {
         const w = Math.max(1, Math.round(grey.width * this.scale));
         const h = Math.max(1, Math.round(grey.height * this.scale));
@@ -34,13 +22,7 @@ class BlockFlowEstimator {
         return { data: data, w: w, h: h };
     }
 
-    /**
-     * Range of grey levels inside one block, used to reject flat blocks.
-     * @param {object} frame - {data, w, h} of the reduced frame.
-     * @param {number} blockX - Left edge of the block.
-     * @param {number} blockY - Top edge of the block.
-     * @return {number} Difference between the highest and lowest grey level.
-     */
+    /** Range of grey levels inside one block, used to reject flat blocks. */
     blockContrast(frame, blockX, blockY) {
         let low = 255;
         let high = 0;
@@ -54,16 +36,7 @@ class BlockFlowEstimator {
         return high - low;
     }
 
-    /**
-     * Finds the offset with the lowest sum of absolute differences for one
-     * block of frame A inside frame B.
-     * @param {object} frameA - {data, w, h} of the first reduced frame.
-     * @param {object} frameB - {data, w, h} of the second reduced frame.
-     * @param {number} blockX - Left edge of the block in frame A.
-     * @param {number} blockY - Top edge of the block in frame A.
-     * @return {object} {dx, dy} of the match with the lowest score, in
-     *     reduced pixels.
-     */
+    /** Finds the best match for one block of frame A inside frame B. */
     matchBlock(frameA, frameB, blockX, blockY) {
         let bestScore = Infinity;
         let bestX = 0;
@@ -100,11 +73,7 @@ class BlockFlowEstimator {
         return { dx: bestX, dy: bestY };
     }
 
-    /**
-     * Median of a list of numbers.
-     * @param {Array<number>} values - The values to reduce.
-     * @return {number} The median, or 0 for an empty list.
-     */
+    /** Median of a list of numbers. */
     median(values) {
         if (values.length === 0) return 0;
         const sorted = values.slice().sort((a, b) => a - b);
@@ -114,13 +83,7 @@ class BlockFlowEstimator {
             : (sorted[middle - 1] + sorted[middle]) / 2;
     }
 
-    /**
-     * Estimates the shift between two greyscale frames.
-     * @param {p5.Image} greyA - Greyscale Frame A.
-     * @param {p5.Image} greyB - Greyscale Frame B.
-     * @return {object} {dx, dy, vectors, matched, total, millis} in the
-     *     coordinates of the original frames.
-     */
+    /** Estimates the shift between two greyscale frames. */
     estimate(greyA, greyB) {
         const startedAt = millis();
         const frameA = this.reduce(greyA);

@@ -1,12 +1,6 @@
-/**
- * Routes keys between the two tasks. Key 1 selects Task 1, key 2 selects
- * Task 2, any other key goes to the screen on show.
- */
+/** Routes keys between the two tasks. Key 1 and key 2 pick the task. */
 class AppController {
-    /**
-     * @param {CarouselScreen} carouselScreen - Task 1 screen.
-     * @param {PanoramaScreen} panoramaScreen - Task 2 screen.
-     */
+    /** Takes the Task 1 screen and the Task 2 screen. */
     constructor(carouselScreen, panoramaScreen) {
         /** @type {object} Screens keyed by the number that selects them. */
         this.screens = { "1": carouselScreen, "2": panoramaScreen };
@@ -16,10 +10,7 @@ class AppController {
         this.showingHelp = false;
     }
 
-    /**
-     * Every key the app accepts, grouped by where it applies.
-     * @return {Array<Array<string>>} Rows of [key, meaning].
-     */
+    /** Every key the app accepts, grouped by where it applies. */
     static get HELP_KEYS() {
         return [
             ["1", "load Task 1, the streaming carousel"],
@@ -46,11 +37,7 @@ class AppController {
         ];
     }
 
-    /**
-     * Puts one task on screen and tells the outgoing screen it is leaving.
-     * @param {string} taskKey - "1" or "2".
-     * @return {void}
-     */
+    /** Puts one task on screen and tells the outgoing screen it is leaving. */
     selectTask(taskKey) {
         const next = this.screens[taskKey];
         if (!next || next === this.activeScreen) return;
@@ -60,12 +47,7 @@ class AppController {
         this.activeScreen.enter();
     }
 
-    /**
-     * Sends a key press to the task switcher or to the active screen.
-     * @param {string} pressedKey - Key character.
-     * @param {number} pressedCode - p5 key code.
-     * @return {void}
-     */
+    /** Sends a key press to the task switcher or to the active screen. */
     handleKey(pressedKey, pressedCode) {
         if (pressedKey === "1" || pressedKey === "2") {
             this.selectTask(pressedKey);
@@ -80,19 +62,12 @@ class AppController {
         }
     }
 
-    /**
-     * Advances the active screen.
-     * @return {void}
-     */
+    /** Advances the active screen. */
     update() {
         if (this.activeScreen) this.activeScreen.update();
     }
 
-    /**
-     * Draws the header and the active screen, or the prompt when no task
-     * has been selected.
-     * @return {void}
-     */
+    /** Draws the header and the active screen, or the start prompt. */
     draw() {
         background(16, 18, 24);
         this.drawHeader();
@@ -116,10 +91,7 @@ class AppController {
         if (this.showingHelp) this.drawHelp();
     }
 
-    /**
-     * Draws the key list over the canvas.
-     * @return {void}
-     */
+    /** Draws the key list over the canvas. */
     drawHelp() {
         push();
         noStroke();
@@ -158,10 +130,7 @@ class AppController {
         pop();
     }
 
-    /**
-     * Draws the title bar with the task name and the keys available now.
-     * @return {void}
-     */
+    /** Draws the title bar with the task name and the keys available now. */
     drawHeader() {
         push();
         noStroke();

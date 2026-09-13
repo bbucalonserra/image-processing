@@ -1,14 +1,6 @@
-/**
- * Drives the sequence fade in, zoom in, fade out, then fade in, zoom out,
- * fade out, repeating. One pass is a stage, and the zoom flips each stage.
- */
+/** Runs fade in, zoom in, fade out, then the same with zoom out. */
 class AnimationCycle {
-    /**
-     * @param {number} stageDuration - Stage length in milliseconds.
-     * @param {number} minScale - Small end of the zoom.
-     * @param {number} maxScale - Large end of the zoom.
-     * @param {number} fadeFraction - Share of the stage spent fading, 0 to 0.5.
-     */
+    /** Stage length in ms, zoom ends and the share spent fading. */
     constructor(stageDuration, minScale, maxScale, fadeFraction) {
         this.stageDuration = stageDuration;
         this.minScale = minScale;
@@ -20,19 +12,13 @@ class AnimationCycle {
         this.zoomingIn = true;
     }
 
-    /**
-     * Restarts at the beginning of a zoom in stage.
-     * @return {void}
-     */
+    /** Restarts at the beginning of a zoom in stage. */
     restart() {
         this.elapsed = 0;
         this.zoomingIn = true;
     }
 
-    /**
-     * Advances the timer by one frame. The step is capped at 100 ms.
-     * @return {boolean} Whether a stage finished on this frame.
-     */
+    /** Advances the timer by one frame. The step is capped at 100 ms. */
     update() {
         this.elapsed += Math.min(deltaTime, 100);
         if (this.elapsed < this.stageDuration) return false;
@@ -42,25 +28,18 @@ class AnimationCycle {
         return true;
     }
 
-    /**
-     * @return {number} Position in the current stage, 0 to 1.
-     */
+    /** Position in the current stage, 0 to 1. */
     progress() {
         return this.elapsed / this.stageDuration;
     }
 
-    /**
-     * Progress with a smoothstep applied.
-     * @return {number} Eased position in the current stage, 0 to 1.
-     */
+    /** Progress with a smoothstep applied. */
     easedProgress() {
         const p = this.progress();
         return p * p * (3 - 2 * p);
     }
 
-    /**
-     * @return {number} Opacity for the current frame, 0 to 255.
-     */
+    /** Opacity for the current frame, 0 to 255. */
     alpha() {
         const p = this.progress();
         if (p < this.fadeFraction) {
@@ -72,10 +51,7 @@ class AnimationCycle {
         return 255;
     }
 
-    /**
-     * @return {number} Scale for the current frame: small to large on a zoom
-     *     in stage, large to small on a zoom out.
-     */
+    /** Scale for the current frame, small to large or large to small. */
     scaleFactor() {
         const p = this.easedProgress();
         return this.zoomingIn
@@ -83,9 +59,7 @@ class AnimationCycle {
             : lerp(this.maxScale, this.minScale, p);
     }
 
-    /**
-     * @return {string} Phase in progress, for the HUD.
-     */
+    /** Phase in progress, for the HUD. */
     phaseName() {
         const p = this.progress();
         const zoom = this.zoomingIn ? "zoom in" : "zoom out";

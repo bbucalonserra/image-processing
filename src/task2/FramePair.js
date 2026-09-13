@@ -1,15 +1,6 @@
-/**
- * One pair of frames and everything derived from it. Each stage is computed
- * once and cached.
- */
+/** One pair of frames and everything built from it, cached by stage. */
 class FramePair {
-    /**
-     * @param {string} label - Pair name shown on screen.
-     * @param {p5.Image} frameA - First frame.
-     * @param {p5.Image} frameB - Second frame.
-     * @param {string} expected - Direction the pair was built to show, checked
-     *     against the estimate on screen.
-     */
+    /** Pair name, the two frames and the direction it was built to show. */
     constructor(label, frameA, frameB, expected) {
         this.label = label;
         this.frameA = frameA;
@@ -30,34 +21,25 @@ class FramePair {
         this.motion = null;
         /** @type {object|null} Output of the block matching estimator. */
         this.flow = null;
-        /** @type {object|null} Motion reported by the block matching method. */
+        /** @type {object|null} Motion from the block matching method. */
         this.flowMotion = null;
         /** @type {number} Threshold the cached binaries were built with. */
         this.binaryThreshold = -1;
     }
 
-    /**
-     * @param {number} slot - 0 for Frame A, 1 for Frame B.
-     * @return {p5.Image} Original frame in that slot.
-     */
+    /** Original frame in that slot. */
     frame(slot) {
         return slot === 0 ? this.frameA : this.frameB;
     }
 
-    /**
-     * Converts both frames to greyscale.
-     * @return {void}
-     */
+    /** Converts both frames to greyscale. */
     buildGrey() {
         if (this.grey[0]) return;
         this.grey[0] = GreyscaleFilter.apply(this.frameA);
         this.grey[1] = GreyscaleFilter.apply(this.frameB);
     }
 
-    /**
-     * Runs the edge filter on both greyscale frames.
-     * @return {void}
-     */
+    /** Runs the edge filter on both greyscale frames. */
     buildEdges() {
         if (this.edges[0]) return;
         this.buildGrey();
@@ -65,11 +47,7 @@ class FramePair {
         this.edges[1] = EdgeDetector.detect(this.grey[1]);
     }
 
-    /**
-     * Thresholds both edge images, redone when the slider value changed.
-     * @param {number} threshold - Strength a pixel must reach.
-     * @return {void}
-     */
+    /** Thresholds both edge images, redone when the slider value changed. */
     buildBinary(threshold) {
         if (this.binary[0] && this.binaryThreshold === threshold) return;
         this.buildEdges();
@@ -77,18 +55,13 @@ class FramePair {
         this.binary[1] = EdgeThresholder.apply(this.edges[1], threshold);
         this.binaryThreshold = threshold;
 
-        // The centroids come from the thresholded pixels, so they are
-        // dropped whenever the threshold changes.
+        // The centroids come from the thresholded pixels, so they drop.
         this.centroids = [null, null];
         this.centroidsBuilt = false;
         this.motion = null;
     }
 
-    /**
-     * Computes the centroid of both thresholded frames.
-     * @param {number} threshold - Strength a pixel must reach.
-     * @return {void}
-     */
+    /** Computes the centroid of both thresholded frames. */
     buildCentroids(threshold) {
         this.buildBinary(threshold);
         if (this.centroidsBuilt) return;
@@ -97,12 +70,7 @@ class FramePair {
         this.centroidsBuilt = true;
     }
 
-    /**
-     * Estimates the motion between the two centroids.
-     * @param {number} threshold - Strength a pixel must reach.
-     * @param {MotionEstimator} estimator - Estimator to use.
-     * @return {void}
-     */
+    /** Estimates the motion between the two centroids. */
     buildMotion(threshold, estimator) {
         this.buildCentroids(threshold);
         if (this.motion) return;
@@ -110,12 +78,7 @@ class FramePair {
         this.motion = estimator.estimate(this.centroids[0], this.centroids[1]);
     }
 
-    /**
-     * Runs the block matching estimator on the greyscale frames, once.
-     * @param {BlockFlowEstimator} flowEstimator - Block matching estimator.
-     * @param {MotionEstimator} estimator - Classifier for the shift it finds.
-     * @return {void}
-     */
+    /** Runs the block matching estimator on the greyscale frames, once. */
     buildFlow(flowEstimator, estimator) {
         if (this.flow) return;
         this.buildGrey();

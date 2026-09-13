@@ -1,5 +1,5 @@
 /**
- * COMMENTARY (486 words).
+ * COMMENTARY (498 words).
  *
  * 1. WALKTHROUGH
  *    Keys "1" and "2" load the tasks and "H" presents the key list; the header
@@ -69,10 +69,7 @@ let pairImages = [];
 /** @type {p5.Graphics} Backdrop behind the featured subject. */
 let backdropImage;
 
-/**
- * Loads every image before setup runs (week 12).
- * @return {void}
- */
+/** Loads every image before setup runs (week 12). */
 function preload() {
     for (const file of ThresholdSettings.FILES) {
         sourceImages.push(loadImage(file));
@@ -86,9 +83,7 @@ function preload() {
     }
 }
 
-/**
- * @return {void}
- */
+/** Builds the canvas, the backdrop and the two screens. */
 function setup() {
     createCanvas(CANVAS_W, CANVAS_H);
     // One image pixel per array entry, whatever the screen density (week 13).
@@ -106,17 +101,13 @@ function setup() {
     );
 }
 
-/**
- * @return {void}
- */
+/** Runs one frame of the screen on show. */
 function draw() {
     appController.update();
     appController.draw();
 }
 
-/**
- * @return {void}
- */
+/** Sends the key press to the controller. */
 function keyPressed() {
     appController.handleKey(key, keyCode);
 }

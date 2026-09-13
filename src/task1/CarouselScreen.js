@@ -1,14 +1,6 @@
-/**
- * Task 1. Keys c, l and s open the carousel, process the images and start
- * the animation. Draws the stage panel and the row of cards.
- */
+/** Task 1. Keys c, l and s open, load and start the carousel. */
 class CarouselScreen extends Screen {
-    /**
-     * @param {Array<p5.Image>} sourceImages - The eight provided images.
-     * @param {p5.Graphics} backdrop - Drawn behind the featured subject.
-     * @param {number} panelTop - Top of the stage panel.
-     * @param {number} panelHeight - Stage panel height in pixels.
-     */
+    /** The eight images, the backdrop and the stage panel box. */
     constructor(sourceImages, backdrop, panelTop, panelHeight) {
         super("TASK 1 - STREAMING CAROUSEL", [
             "idle", "carousel", "loaded", "running"
@@ -18,7 +10,7 @@ class CarouselScreen extends Screen {
         this.panelTop = panelTop;
         this.panelHeight = panelHeight;
 
-        /** @type {number} Width every image is reduced to before processing. */
+        /** @type {number} Width every image is reduced to. */
         this.workingWidth = 400;
         /** @type {number} Matching height limit, aspect ratio kept. */
         this.workingHeight = 480;
@@ -26,7 +18,7 @@ class CarouselScreen extends Screen {
         /** @type {BackgroundRemover} Threshold based cut out. */
         this.remover = new BackgroundRemover(new MaskRefiner(60, 1, 1));
         /** @type {Carousel} The scrolling row of processed entries. */
-        this.carousel = new Carousel(190, 18, 26);
+        this.carousel = new Carousel(190, 18, 6);
         /** @type {AnimationCycle} Fade and zoom timing of the entry. */
         this.cycle = new AnimationCycle(5200, 0.72, 1.15, 0.25);
         /** @type {ScrollingBackground} Backdrop travelling left to right. */
@@ -46,12 +38,7 @@ class CarouselScreen extends Screen {
         this.loadMillis = 0;
     }
 
-    /**
-     * Handles the c, l and s keys.
-     * @param {string} pressedKey - Key character, lower cased.
-     * @param {number} pressedCode - p5 key code.
-     * @return {void}
-     */
+    /** Handles the c, l, s and v keys, and the arrows. */
     handleKey(pressedKey, pressedCode) {
         if (pressedKey === "c") {
             this.requestStage("carousel");
@@ -71,11 +58,7 @@ class CarouselScreen extends Screen {
         }
     }
 
-    /**
-     * Processes the featured image twice, once with the chosen row and once
-     * with the row of the other colour space, and keeps both results.
-     * @return {object} {chosen, alternative} results for the featured image.
-     */
+    /** Processes the featured image with both rows and keeps the two. */
     buildComparison() {
         const index = this.carousel.featuredIndex;
         if (this.comparisons[index]) return this.comparisons[index];
@@ -99,10 +82,7 @@ class CarouselScreen extends Screen {
         return this.comparisons[index];
     }
 
-    /**
-     * Processes every image through its own row of the thresholds table.
-     * @return {void}
-     */
+    /** Processes every image through its own row of the thresholds table. */
     loadItems() {
         const startedAt = millis();
         const items = [];
@@ -125,13 +105,9 @@ class CarouselScreen extends Screen {
         this.loadMillis = millis() - startedAt;
     }
 
-    /**
-     * Advances the load, the card row and the animation.
-     * @return {void}
-     */
+    /** Advances the load, the card row and the animation. */
     update() {
-        // The notice gets one frame on screen before processing blocks the
-        // loop.
+        // The notice gets one frame on screen before processing blocks.
         if (this.pendingLoad) {
             if (this.noticeFrames > 0) {
                 this.loadItems();
@@ -142,7 +118,7 @@ class CarouselScreen extends Screen {
         }
 
         if (this.stageIndex >= this.stages.indexOf("loaded")) {
-            this.carousel.update();
+            this.carousel.update(width);
         }
         if (this.currentStage() === "running") {
             this.background.update(this.panelHeight);
@@ -150,10 +126,7 @@ class CarouselScreen extends Screen {
         }
     }
 
-    /**
-     * Draws the stage panel, then the row of cards.
-     * @return {void}
-     */
+    /** Draws the stage panel, then the row of cards. */
     draw() {
         this.drawPanel();
         this.carousel.draw(
@@ -164,11 +137,7 @@ class CarouselScreen extends Screen {
         );
     }
 
-    /**
-     * Draws the backdrop, the subject and the caption, or the prompt for the
-     * stage not yet reached.
-     * @return {void}
-     */
+    /** Draws the backdrop, subject and caption, or the next prompt. */
     drawPanel() {
         if (this.comparing && this.carousel.isLoaded()) {
             this.drawComparison();
@@ -220,18 +189,9 @@ class CarouselScreen extends Screen {
         this.drawStatus(item);
     }
 
-    /**
-     * Draws the subject travelling left to right while it fades and zooms.
-     * Position and size are passed to image(), without translate().
-     * @param {CarouselItem} item - Featured entry.
-     * @param {number} progress - Position in the stage, 0 to 1.
-     * @param {number} alphaValue - Opacity, 0 to 255.
-     * @param {number} scaleFactor - Zoom for this frame.
-     * @return {void}
-     */
+    /** Draws the subject moving left to right as it fades and zooms. */
     drawSubject(item, progress, alphaValue, scaleFactor) {
-        // The margin keeps the subject inside the panel at the top of the
-        // zoom.
+        // The margin keeps the subject inside the panel at full zoom.
         const drawH = (this.panelHeight - 110) * scaleFactor;
         const drawW = drawH * (item.foreground.width / item.foreground.height);
         const centreX = lerp(drawW * 0.6, width - drawW * 0.6, progress);
@@ -249,11 +209,7 @@ class CarouselScreen extends Screen {
         pop();
     }
 
-    /**
-     * Draws the two cut outs side by side with the row and the error count
-     * of each.
-     * @return {void}
-     */
+    /** Draws the two cut outs side by side with their error counts. */
     drawComparison() {
         const result = this.buildComparison();
         const index = this.carousel.featuredIndex;
@@ -307,16 +263,7 @@ class CarouselScreen extends Screen {
         pop();
     }
 
-    /**
-     * Draws one side of the comparison, centred on a column.
-     * @param {number} centreX - Centre of the column.
-     * @param {number} y - Top edge of the cut out.
-     * @param {number} boxH - Height the cut out is drawn at.
-     * @param {string} title - Caption above the cut out.
-     * @param {Array<number>} row - The threshold row used.
-     * @param {object} result - Output of removeBackgroundWithCounts.
-     * @return {void}
-     */
+    /** Draws one side of the comparison, centred on a column. */
     drawComparisonSide(centreX, y, boxH, title, row, result) {
         const w = boxH * (result.image.width / result.image.height);
         const x = centreX - w / 2;
@@ -344,11 +291,7 @@ class CarouselScreen extends Screen {
         pop();
     }
 
-    /**
-     * Draws a prompt on the stage panel.
-     * @param {string} message - Prompt to show.
-     * @return {void}
-     */
+    /** Draws a prompt on the stage panel. */
     drawNotice(message) {
         push();
         noStroke();
@@ -359,11 +302,7 @@ class CarouselScreen extends Screen {
         pop();
     }
 
-    /**
-     * Draws the threshold row and animation phase of the featured entry.
-     * @param {CarouselItem} item - Featured entry.
-     * @return {void}
-     */
+    /** Draws the threshold row and animation phase of the featured entry. */
     drawStatus(item) {
         const phase = this.currentStage() === "running"
             ? this.cycle.phaseName()
@@ -384,9 +323,7 @@ class CarouselScreen extends Screen {
         pop();
     }
 
-    /**
-     * @return {string} Keys available now, for the header.
-     */
+    /** Keys available now, for the header. */
     hint() {
         if (this.currentStage() === "idle") return "[C] carousel";
         if (!this.carousel.isLoaded()) return "[C] carousel  [L] load images";

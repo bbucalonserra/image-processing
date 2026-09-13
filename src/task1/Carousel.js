@@ -1,14 +1,10 @@
 /** Holds the processed entries and scrolls them horizontally. */
 class Carousel {
-    /**
-     * @param {number} cardWidth - Card width in pixels.
-     * @param {number} cardGap - Gap between cards in pixels.
-     * @param {number} speed - Scroll speed in pixels per second.
-     */
-    constructor(cardWidth, cardGap, speed) {
+    /** Card width, gap between cards and how fast the scroll catches up. */
+    constructor(cardWidth, cardGap, easeRate) {
         this.cardWidth = cardWidth;
         this.cardGap = cardGap;
-        this.speed = speed;
+        this.easeRate = easeRate;
 
         /** @type {Array<CarouselItem>} Entries currently in the row. */
         this.items = [];
@@ -17,70 +13,63 @@ class Carousel {
         this.offset = 0;
     }
 
-    /**
-     * Replaces the row with a new set of entries.
-     * @param {Array<CarouselItem>} items - Processed entries.
-     * @return {void}
-     */
+    /** Replaces the row with a new set of entries. */
     setItems(items) {
         this.items = items;
         this.featuredIndex = 0;
         this.offset = 0;
     }
 
-    /**
-     * @return {boolean} Whether entries have been loaded.
-     */
+    /** True once entries have been loaded. */
     isLoaded() {
         return this.items.length > 0;
     }
 
-    /**
-     * @return {CarouselItem|null} Entry on the stage.
-     */
+    /** The entry shown on the stage, or null when the row is empty. */
     featuredItem() {
         if (!this.isLoaded()) return null;
         return this.items[this.featuredIndex];
     }
 
-    /**
-     * Moves to the next entry, wrapping at the end of the row.
-     * @return {void}
-     */
+    /** Moves to the next entry, wrapping at the end of the row. */
     advanceFeatured() {
         if (!this.isLoaded()) return;
         this.featuredIndex = (this.featuredIndex + 1) % this.items.length;
     }
 
-    /**
-     * Moves to the previous entry, wrapping at the start of the row.
-     * @return {void}
-     */
+    /** Moves to the previous entry, wrapping at the start of the row. */
     retreatFeatured() {
         if (!this.isLoaded()) return;
         const count = this.items.length;
         this.featuredIndex = (this.featuredIndex + count - 1) % count;
     }
 
-    /**
-     * Advances the scroll and wraps it by one card pitch.
-     * @return {void}
-     */
-    update() {
-        if (!this.isLoaded()) return;
+    /** Scroll position that centres the featured entry, nearest copy first. */
+    targetOffset(stripW) {
         const pitch = this.cardWidth + this.cardGap;
-        this.offset += (this.speed * Math.min(deltaTime, 100)) / 1000;
-        this.offset = this.offset % pitch;
+        const count = this.items.length;
+        const centred = (this.offset + stripW / 2 - this.cardWidth / 2) / pitch;
+
+        let index = Math.round(centred);
+        let gap = ((this.featuredIndex - index) % count + count) % count;
+        if (gap > count / 2) gap -= count;
+
+        index += gap;
+        return index * pitch + this.cardWidth / 2 - stripW / 2;
     }
 
-    /**
-     * Draws the row inside a strip, repeating the entries on both sides.
-     * @param {number} x - Left edge of the strip.
-     * @param {number} y - Top edge of the strip.
-     * @param {number} stripW - Strip width in pixels.
-     * @param {number} stripH - Strip height in pixels.
-     * @return {void}
-     */
+    /** Eases the scroll towards the featured entry. */
+    update(stripW) {
+        if (!this.isLoaded()) return;
+        const step = Math.min(deltaTime, 100) / 1000;
+        this.offset = lerp(
+            this.offset,
+            this.targetOffset(stripW),
+            Math.min(1, this.easeRate * step)
+        );
+    }
+
+    /** Draws the row. Cards shrink and dim with their distance from centre. */
     draw(x, y, stripW, stripH) {
         push();
         noStroke();
@@ -92,29 +81,38 @@ class Carousel {
 
         const pitch = this.cardWidth + this.cardGap;
         const slots = Math.ceil(stripW / pitch) + 2;
+        const first = Math.floor(this.offset / pitch) - 1;
+        const centre = x + stripW / 2;
+        const fullHeight = stripH - 20;
 
         for (let slot = 0; slot < slots; slot++) {
-            const cardX = x + slot * pitch - this.offset - pitch;
+            const index = first + slot;
+            const cardX = x + index * pitch - this.offset;
             if (cardX > x + stripW || cardX + this.cardWidth < x) continue;
 
-            const item = this.items[this.itemIndexForSlot(slot)];
-            item.draw(
-                cardX,
-                y + 10,
-                this.cardWidth,
-                stripH - 20,
-                item === this.featuredItem()
+            const cardCentre = cardX + this.cardWidth / 2;
+            const away = Math.min(
+                1, Math.abs(cardCentre - centre) / (stripW / 2)
+            );
+            const depth = lerp(1, 0.78, away);
+            const cardW = this.cardWidth * depth;
+            const cardH = fullHeight * depth;
+            const entry = this.itemIndexForSlot(index);
+
+            this.items[entry].draw(
+                cardCentre - cardW / 2,
+                y + 10 + (fullHeight - cardH) / 2,
+                cardW,
+                cardH,
+                entry === this.featuredIndex,
+                lerp(255, 110, away)
             );
         }
     }
 
-    /**
-     * Maps a slot onto an entry, which makes the row repeat.
-     * @param {number} slot - Slot position from the left.
-     * @return {number} Index of the entry drawn in that slot.
-     */
-    itemIndexForSlot(slot) {
+    /** Maps a card position onto an entry, which makes the row repeat. */
+    itemIndexForSlot(index) {
         const count = this.items.length;
-        return ((slot % count) + count) % count;
+        return ((index % count) + count) % count;
     }
 }

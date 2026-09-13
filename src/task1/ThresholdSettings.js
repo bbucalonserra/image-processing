@@ -1,19 +1,11 @@
-/**
- * Per image threshold table, thresholds[i] = [colourSpace, c1, c2, c3],
- * colourSpace 0 for RGB and 1 for HSB.
- */
+/** Threshold table, thresholds[i] = [colourSpace, c1, c2, c3]. */
 class ThresholdSettings {
-    /**
-     * Saturation below which the hue test is skipped.
-     * @return {number} Saturation limit, 0 to 100.
-     */
+    /** Saturation below which the hue test is skipped. */
     static get NEUTRAL_SATURATION() {
         return 5;
     }
 
-    /**
-     * @return {Array<string>} Paths of the eight provided images.
-     */
+    /** Paths of the eight provided images. */
     static get FILES() {
         return [
             "assets/task1/1.jpg",
@@ -27,9 +19,7 @@ class ThresholdSettings {
         ];
     }
 
-    /**
-     * @return {Array<string>} One caption per image.
-     */
+    /** One caption per image. */
     static get CAPTIONS() {
         return [
             "EPISODE 1 - THE POINTER",
@@ -43,14 +33,7 @@ class ThresholdSettings {
         ];
     }
 
-    /**
-     * The table, one row per image, in the order of FILES. RGB rows hold the
-     * minimum red, green and blue of a background pixel. HSB rows hold the
-     * hue tolerance around the backdrop hue, the maximum saturation and the
-     * minimum brightness. Both spaces were measured on every image and the
-     * row kept is the one with fewer mistakes.
-     * @return {Array<Array<number>>} thresholds[i] = [colourSpace, c1, c2, c3].
-     */
+    /** The chosen row per image. RGB holds minimums, HSB holds limits. */
     static get TABLE() {
         return [
             [1, 60, 12, 70],      // 1.jpg - dim warm grey wall.
@@ -64,11 +47,7 @@ class ThresholdSettings {
         ];
     }
 
-    /**
-     * The row with fewer mistakes in the colour space not chosen, one per
-     * image, kept so the comparison can be shown.
-     * @return {Array<Array<number>>} Same format as TABLE.
-     */
+    /** The best row in the colour space not chosen, one per image. */
     static get ALTERNATIVES() {
         return [
             [0, 190, 190, 190],   // 1.jpg - best RGB attempt.
@@ -82,34 +61,22 @@ class ThresholdSettings {
         ];
     }
 
-    /**
-     * @param {number} index - Image index.
-     * @return {Array<number>} The [colourSpace, c1, c2, c3] row.
-     */
+    /** The [colourSpace, c1, c2, c3] row. */
     static settingFor(index) {
         return ThresholdSettings.TABLE[index];
     }
 
-    /**
-     * @param {number} index - Image index.
-     * @return {Array<number>} The row of the colour space not chosen.
-     */
+    /** The row of the colour space not chosen. */
     static alternativeFor(index) {
         return ThresholdSettings.ALTERNATIVES[index];
     }
 
-    /**
-     * @param {number} index - Image index.
-     * @return {string} The chosen row written out for the HUD.
-     */
+    /** The chosen row written out for the HUD. */
     static describe(index) {
         return ThresholdSettings.describeRow(ThresholdSettings.TABLE[index]);
     }
 
-    /**
-     * @param {Array<number>} row - A [colourSpace, c1, c2, c3] row.
-     * @return {string} The row written out for the HUD.
-     */
+    /** The row written out for the HUD. */
     static describeRow(row) {
         if (row[0] === 1) {
             return "HSB  hue +/-" + row[1] + "  sat <= " + row[2] +
