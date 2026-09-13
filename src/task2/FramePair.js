@@ -24,6 +24,8 @@ class FramePair {
         this.binary = [null, null];
         /** @type {Array<object|null>} Centroid of each thresholded frame. */
         this.centroids = [null, null];
+        /** @type {boolean} True once the centroids were computed. */
+        this.centroidsBuilt = false;
         /** @type {object|null} Motion reported by the centroid method. */
         this.motion = null;
         /** @type {object|null} Output of the block matching estimator. */
@@ -78,6 +80,7 @@ class FramePair {
         // The centroids come from the thresholded pixels, so they are
         // dropped whenever the threshold changes.
         this.centroids = [null, null];
+        this.centroidsBuilt = false;
         this.motion = null;
     }
 
@@ -88,9 +91,10 @@ class FramePair {
      */
     buildCentroids(threshold) {
         this.buildBinary(threshold);
-        if (this.centroids[0]) return;
+        if (this.centroidsBuilt) return;
         this.centroids[0] = CentroidAnalyser.compute(this.binary[0]);
         this.centroids[1] = CentroidAnalyser.compute(this.binary[1]);
+        this.centroidsBuilt = true;
     }
 
     /**

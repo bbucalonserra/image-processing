@@ -41,7 +41,7 @@
  *    residual pixels and is not an extension. The frame is cut into blocks, and
  *    each block with enough contrast is searched for in the next frame by the
  *    sum of absolute differences. The displacement is the median of the
- *    vectors. It runs at 1/4 scale, so a window of 90 pixels costs a few
+ *    vectors. It runs at 1/4 scale, so a window of 112 pixels costs a few
  *    milliseconds. It is unique in principle: matching among regions rather
  *    than a centre of mass. Both are shown on screen, validating each other,
  *    and it needs no threshold: with the slider at zero the centroid reports

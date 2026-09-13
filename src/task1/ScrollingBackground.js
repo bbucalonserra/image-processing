@@ -14,13 +14,23 @@ class ScrollingBackground {
     }
 
     /**
+     * Width one copy is drawn at.
+     * @param {number} boxH - Box height in pixels.
+     * @return {number} Tile width in pixels.
+     */
+    tileWidth(boxH) {
+        return boxH * (this.image.width / this.image.height);
+    }
+
+    /**
      * Advances the offset and wraps it after one copy has passed.
-     * @param {number} tileWidth - Width one copy is drawn at.
+     * @param {number} boxH - Box height in pixels.
      * @return {void}
      */
-    update(tileWidth) {
+    update(boxH) {
+        const tile = this.tileWidth(boxH);
         this.offset += (this.speed * Math.min(deltaTime, 100)) / 1000;
-        this.offset = this.offset % tileWidth;
+        this.offset = this.offset % tile;
     }
 
     /**
@@ -32,14 +42,13 @@ class ScrollingBackground {
      * @return {void}
      */
     draw(x, y, boxW, boxH) {
-        const tileWidth = boxH * (this.image.width / this.image.height);
-        this.update(tileWidth);
+        const tile = this.tileWidth(boxH);
 
         push();
         // The first copy starts behind the box, so the gap left by the
         // rightward movement is covered.
-        for (let start = x - tileWidth; start < x + boxW; start += tileWidth) {
-            image(this.image, start + this.offset, y, tileWidth, boxH);
+        for (let start = x - tile; start < x + boxW; start += tile) {
+            image(this.image, start + this.offset, y, tile, boxH);
         }
         noStroke();
         fill(10, 14, 22, 110);

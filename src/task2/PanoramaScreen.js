@@ -602,6 +602,6 @@ class PanoramaScreen extends Screen {
         if (this.currentStage() === "idle") return "[P] panorama screen";
         if (this.pairs.length === 0) return "[P] panorama  [I] load pairs";
         return "[I] pairs  [G] grey  [E] edges  [T] threshold  " +
-            "[N] centroid  [D] arrow  [F] block flow";
+            "[N] centroid  [D] arrow  [F] block flow  [<] [>] change pair";
     }
 }

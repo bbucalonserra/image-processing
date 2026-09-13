@@ -21,24 +21,12 @@ class MaskRefiner {
     }
 
     /**
-     * Runs the four refinement steps.
+     * Runs the four refinement steps and counts the backdrop pixels the flood
+     * fill gives back to the subject.
      * @param {Uint8Array} mask - 1 where the threshold called background.
      * @param {number} w - Mask width in pixels.
      * @param {number} h - Mask height in pixels.
-     * @return {Uint8Array} Alpha channel, 0 background to 255 foreground.
-     */
-    refine(mask, w, h) {
-        return this.refineWithCounts(mask, w, h).alpha;
-    }
-
-    /**
-     * Same chain as refine, and also reports how many pixels the threshold
-     * called background and how many of those were not joined to the border,
-     * the figure the two colour spaces are compared on.
-     * @param {Uint8Array} mask - 1 where the threshold called background.
-     * @param {number} w - Mask width in pixels.
-     * @param {number} h - Mask height in pixels.
-     * @return {object} {alpha, thresholdBackground, reclaimed}.
+     * @return {object} {alpha, reclaimed}.
      */
     refineWithCounts(mask, w, h) {
         const connected = this.keepBorderConnected(mask, w, h);
@@ -54,7 +42,6 @@ class MaskRefiner {
         refined = this.growBackground(refined, w, h);
         return {
             alpha: this.feather(this.toAlpha(refined), w, h),
-            thresholdBackground: thresholdBackground,
             reclaimed: thresholdBackground - connectedBackground
         };
     }

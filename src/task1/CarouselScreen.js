@@ -144,8 +144,9 @@ class CarouselScreen extends Screen {
         if (this.stageIndex >= this.stages.indexOf("loaded")) {
             this.carousel.update();
         }
-        if (this.currentStage() === "running" && this.cycle.update()) {
-            this.carousel.advanceFeatured();
+        if (this.currentStage() === "running") {
+            this.background.update(this.panelHeight);
+            if (this.cycle.update()) this.carousel.advanceFeatured();
         }
     }
 
@@ -364,6 +365,10 @@ class CarouselScreen extends Screen {
      * @return {void}
      */
     drawStatus(item) {
+        const phase = this.currentStage() === "running"
+            ? this.cycle.phaseName()
+            : "stopped";
+
         push();
         noStroke();
         fill(180);
@@ -371,7 +376,7 @@ class CarouselScreen extends Screen {
         textSize(13);
         text(
             "Featured " + (this.carousel.featuredIndex + 1) + "/8   " +
-            item.settingLabel + "   phase: " + this.cycle.phaseName() +
+            item.settingLabel + "   phase: " + phase +
             "   processed in " + Math.round(this.loadMillis) + " ms",
             18,
             this.panelTop + 10
@@ -386,6 +391,6 @@ class CarouselScreen extends Screen {
         if (this.currentStage() === "idle") return "[C] carousel";
         if (!this.carousel.isLoaded()) return "[C] carousel  [L] load images";
         return "[C] carousel  [L] load images  [S] start animation  " +
-            "[V] compare colour spaces";
+            "[V] compare colour spaces  [<] [>] change image";
     }
 }
